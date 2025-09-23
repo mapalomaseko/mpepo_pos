@@ -1,0 +1,1 @@
+"""Smart POS backend package."""

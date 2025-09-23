@@ -1,0 +1,116 @@
+{
+  "info": {
+    "name": "Smart POS API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Collection covering the Smart POS backend endpoints."
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8000" },
+    { "key": "mockUrl", "value": "https://postman-echo.com/post" }
+  ],
+  "item": [
+    {
+      "name": "List products",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/products/",
+          "host": ["{{baseUrl}}"],
+          "path": ["products", ""]
+        }
+      }
+    },
+    {
+      "name": "Create product",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Chapati\",\n  \"price\": 1.5,\n  \"stock\": 20\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/products/",
+          "host": ["{{baseUrl}}"],
+          "path": ["products", ""]
+        }
+      }
+    },
+    {
+      "name": "Checkout",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"items\": [{ \"product_id\": 1, \"qty\": 2 }],\n  \"discount_percent\": 10\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/checkout/",
+          "host": ["{{baseUrl}}"],
+          "path": ["checkout", ""]
+        }
+      }
+    },
+    {
+      "name": "Submit invoice",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/invoices/submit/1",
+          "host": ["{{baseUrl}}"],
+          "path": ["invoices", "submit", "1"]
+        }
+      }
+    },
+    {
+      "name": "List invoices",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/invoices/",
+          "host": ["{{baseUrl}}"],
+          "path": ["invoices", ""]
+        }
+      }
+    },
+    {
+      "name": "Daily report",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/reports/daily?date=2023-01-01",
+          "host": ["{{baseUrl}}"],
+          "path": ["reports", "daily"],
+          "query": [{ "key": "date", "value": "2023-01-01" }]
+        }
+      }
+    },
+    {
+      "name": "Mock tax authority",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"ACCEPTED\",\n  \"reference\": \"TA-INV-12345\",\n  \"received_at\": \"2023-01-01T00:00:00Z\"\n}"
+        },
+        "url": {
+          "raw": "{{mockUrl}}/invoice",
+          "host": ["{{mockUrl}}"],
+          "path": ["invoice"]
+        }
+      }
+    }
+  ]
+}

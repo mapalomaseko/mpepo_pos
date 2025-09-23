@@ -1,0 +1,340 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "Smart POS API",
+    "version": "0.1.0",
+    "description": "Minimal API for product management, checkout, invoicing and reports."
+  },
+  "servers": [
+    { "url": "http://localhost:8000" }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Health check",
+        "responses": {
+          "200": {
+            "description": "API is running",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products/": {
+      "get": {
+        "summary": "List products",
+        "tags": ["products"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Product" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create product",
+        "tags": ["products"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ProductCreate" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Product" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products/{product_id}": {
+      "get": {
+        "summary": "Get product",
+        "tags": ["products"],
+        "parameters": [
+          { "$ref": "#/components/parameters/ProductId" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Product" }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update product",
+        "tags": ["products"],
+        "parameters": [
+          { "$ref": "#/components/parameters/ProductId" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ProductUpdate" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Product" }
+              }
+            }
+          },
+          "404": { "description": "Not found" }
+        }
+      },
+      "delete": {
+        "summary": "Delete product",
+        "tags": ["products"],
+        "parameters": [
+          { "$ref": "#/components/parameters/ProductId" }
+        ],
+        "responses": {
+          "204": { "description": "Deleted" },
+          "404": { "description": "Not found" }
+        }
+      }
+    },
+    "/checkout/": {
+      "post": {
+        "summary": "Create receipt",
+        "tags": ["checkout"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CheckoutRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Receipt created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Receipt" }
+              }
+            }
+          },
+          "400": { "description": "Invalid request" }
+        }
+      }
+    },
+    "/invoices/submit/{receipt_id}": {
+      "post": {
+        "summary": "Submit invoice",
+        "tags": ["invoices"],
+        "parameters": [
+          {
+            "name": "receipt_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Invoice stored",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Invoice" }
+              }
+            }
+          },
+          "404": { "description": "Receipt not found" },
+          "502": { "description": "Upstream failure" }
+        }
+      }
+    },
+    "/invoices/": {
+      "get": {
+        "summary": "List invoices",
+        "tags": ["invoices"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "invoices": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Invoice" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reports/daily": {
+      "get": {
+        "summary": "Daily sales report",
+        "tags": ["reports"],
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "format": "date" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Aggregated totals",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DailyReport" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "ProductId": {
+        "name": "product_id",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "integer" }
+      }
+    },
+    "schemas": {
+      "Product": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "price": { "type": "number" },
+          "stock": { "type": "integer" },
+          "created_at": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "name", "price", "stock", "created_at"]
+      },
+      "ProductCreate": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "price": { "type": "number" },
+          "stock": { "type": "integer" }
+        },
+        "required": ["name", "price", "stock"]
+      },
+      "ProductUpdate": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "price": { "type": "number" },
+          "stock": { "type": "integer" }
+        }
+      },
+      "CheckoutItem": {
+        "type": "object",
+        "properties": {
+          "product_id": { "type": "integer" },
+          "qty": { "type": "integer" }
+        },
+        "required": ["product_id", "qty"]
+      },
+      "CheckoutRequest": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/CheckoutItem" }
+          },
+          "discount_percent": { "type": "number" }
+        },
+        "required": ["items"]
+      },
+      "ReceiptItem": {
+        "type": "object",
+        "properties": {
+          "product_id": { "type": "integer" },
+          "name": { "type": "string" },
+          "qty": { "type": "integer" },
+          "unit_price": { "type": "number" },
+          "line_total": { "type": "number" }
+        },
+        "required": ["product_id", "name", "qty", "unit_price", "line_total"]
+      },
+      "Receipt": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "items": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ReceiptItem" }
+          },
+          "subtotal": { "type": "number" },
+          "tax": { "type": "number" },
+          "discount": { "type": "number" },
+          "total": { "type": "number" },
+          "created_at": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "items", "subtotal", "tax", "discount", "total", "created_at"]
+      },
+      "Invoice": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "receipt_id": { "type": "integer" },
+          "payload_json": { "type": "object" },
+          "authority_response_json": { "type": "object" },
+          "status": { "type": "string" },
+          "created_at": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "receipt_id", "payload_json", "status", "created_at"]
+      },
+      "DailyReport": {
+        "type": "object",
+        "properties": {
+          "date": { "type": "string", "format": "date" },
+          "receipt_count": { "type": "integer" },
+          "total_sales": { "type": "number" },
+          "total_tax": { "type": "number" }
+        },
+        "required": ["date", "receipt_count", "total_sales", "total_tax"]
+      }
+    }
+  }
+}
