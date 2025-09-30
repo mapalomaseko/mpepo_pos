@@ -420,6 +420,7 @@ class _CategoryGrid extends StatelessWidget {
     );
   }
 
+
   int _columnCountForWidth(double width) {
     if (width >= 1200) {
       return 4;
