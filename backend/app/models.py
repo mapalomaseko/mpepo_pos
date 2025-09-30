@@ -16,6 +16,9 @@ class Product(Base):
     name = Column(String(255), nullable=False)
     price = Column(Float, nullable=False)
     stock = Column(Integer, nullable=False, default=0)
+    description = Column(Text, nullable=True)
+    category = Column(String(100), nullable=True)
+    image_url = Column(String(512), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
 
