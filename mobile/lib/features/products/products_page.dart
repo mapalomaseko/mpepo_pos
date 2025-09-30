@@ -542,15 +542,15 @@ class _ProductCard extends StatelessWidget {
                   ),
                   if (onEdit != null || onDelete != null)
                     Positioned(
-                      top: 1,
-                      right: 1,
+                      top: 6,
+                      right: 6,
                       child: Material(
-                        color: Colors.transparent,
+                        color: Colors.black54,
                         borderRadius: BorderRadius.circular(16),
                         clipBehavior: Clip.antiAlias,
                         child: PopupMenuButton<String>(
                           padding: EdgeInsets.zero,
-                          icon: const Icon(Icons.more_vert, color: Colors.black54, size: 20),
+                          icon: const Icon(Icons.more_vert, color: Colors.white, size: 20),
                           onSelected: (value) {
                             if (value == 'edit' && onEdit != null) {
                               onEdit!();

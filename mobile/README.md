@@ -23,7 +23,10 @@ sales report view.
 
 If the device is offline or the invoice submission fails, the job is stored in a local
 `sqflite` database. A connectivity listener automatically retries pending jobs when the
-network returns. You can also manually retry failed jobs from the **Invoices** tab.
+network returns, and a background timer gives it another chance every five minutes while
+you remain online. Previously failed jobs are reset to "pending" as soon as the device
+reconnects, so anything stuck in the queue will be retried automatically. You can also
+manually retry failed jobs from the **Invoices** tab.
 
 ## Tests
 
