@@ -387,7 +387,6 @@ class _ProductsPageState extends State<ProductsPage> {
     );
   }
 }
-
 class _CategoryGrid extends StatelessWidget {
   const _CategoryGrid({
     required this.category,
