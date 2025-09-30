@@ -44,8 +44,18 @@ class ApiService {
     required String name,
     required double price,
     required int stock,
+    String? description,
+    String? category,
+    String? imageUrl,
   }) async {
-    final payload = {'name': name, 'price': price, 'stock': stock};
+    final payload = <String, dynamic>{
+      'name': name,
+      'price': price,
+      'stock': stock,
+      if (description != null && description.isNotEmpty) 'description': description,
+      if (category != null && category.isNotEmpty) 'category': category,
+      if (imageUrl != null && imageUrl.isNotEmpty) 'image_url': imageUrl,
+    };
     final response = await _client.post(
       _uri('/products/'),
       headers: {'Content-Type': 'application/json'},
@@ -56,7 +66,17 @@ class ApiService {
   }
 
   Future<Product> updateProduct(Product product) async {
-    final payload = {'name': product.name, 'price': product.price, 'stock': product.stock};
+    final payload = <String, dynamic>{
+      'name': product.name,
+      'price': product.price,
+      'stock': product.stock,
+      if (product.description != null && product.description!.isNotEmpty)
+        'description': product.description,
+      if (product.category != null && product.category!.isNotEmpty)
+        'category': product.category,
+      if (product.imageUrl != null && product.imageUrl!.isNotEmpty)
+        'image_url': product.imageUrl,
+    };
     final response = await _client.put(
       _uri('/products/${product.id}'),
       headers: {'Content-Type': 'application/json'},

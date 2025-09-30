@@ -26,7 +26,14 @@ class _FakeProductRepository extends ProductRepository {
   }
 
   @override
-  Future<Product> createProduct(String name, double price, int stock) {
+  Future<Product> createProduct({
+    required String name,
+    required double price,
+    required int stock,
+    String? description,
+    String? category,
+    String? imageUrl,
+  }) {
     throw UnimplementedError();
   }
 
@@ -44,15 +51,7 @@ class _FakeProductRepository extends ProductRepository {
 void main() {
   testWidgets('ProductsPage renders provided products', (tester) async {
     final provider = ProductsProvider(_FakeProductRepository());
-    provider.products = [
-      Product(
-        id: 1,
-        name: 'Chapati',
-        price: 10,
-        stock: 100,
-        createdAt: DateTime.now(),
-      ),
-    ];
+    await provider.loadProducts();
 
     await tester.pumpWidget(
       MultiProvider(
