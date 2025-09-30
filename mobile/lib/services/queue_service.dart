@@ -38,6 +38,22 @@ class QueueService {
     await _emitJobs();
   }
 
+  Future<void> resetFailedJobs() async {
+    if (_db == null) return;
+    final updated = await _db!.update(
+      _tableName,
+      {
+        'status': 'pending',
+        'attempts': 0,
+      },
+      where: 'status = ?',
+      whereArgs: ['failed'],
+    );
+    if (updated > 0) {
+      await _emitJobs();
+    }
+  }
+
   Future<void> enqueueInvoice(int receiptId) async {
     final payload = jsonEncode({'receipt_id': receiptId});
     await _db!.insert(_tableName, {
