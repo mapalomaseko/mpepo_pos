@@ -61,4 +61,6 @@ class Product {
       imageUrl: imageUrl ?? this.imageUrl,
     );
   }
+
+  bool get isStatic => id < 0;
 }
