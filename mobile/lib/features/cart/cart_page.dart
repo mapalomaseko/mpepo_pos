@@ -47,7 +47,7 @@ class _CartPageState extends State<CartPage> {
                         final item = cart.items[index];
                         return ListTile(
                           title: Text(item.product.name),
-                          subtitle: Text('KES ${item.product.price.toStringAsFixed(2)} x ${item.quantity}'),
+                          subtitle: Text('ZMW ${item.product.price.toStringAsFixed(2)} x ${item.quantity}'),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -96,10 +96,10 @@ class _CartPageState extends State<CartPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('Subtotal: KES ${cart.subtotal.toStringAsFixed(2)}'),
-        Text('Tax (~16%): KES ${cart.tax.toStringAsFixed(2)}'),
-        Text('Discount: KES ${cart.discount.toStringAsFixed(2)}'),
-        Text('Total (estimate): KES ${cart.total.toStringAsFixed(2)}'),
+        Text('Subtotal: ZMW ${cart.subtotal.toStringAsFixed(2)}'),
+        Text('Tax (~16%): ZMW ${cart.tax.toStringAsFixed(2)}'),
+        Text('Discount: ZMW ${cart.discount.toStringAsFixed(2)}'),
+        Text('Total (estimate): ZMW ${cart.total.toStringAsFixed(2)}'),
       ],
     );
   }
@@ -107,8 +107,9 @@ class _CartPageState extends State<CartPage> {
   Future<void> _performCheckout(BuildContext context, CartProvider cart) async {
     final api = context.read<ApiService>();
     try {
+      final payload = cart.toCheckoutPayload();
       final receipt = await api.checkout(
-        cart.toCheckoutPayload(),
+        payload,
         discountPercent: cart.discountPercent,
       );
       if (!mounted) return;
@@ -121,4 +122,5 @@ class _CartPageState extends State<CartPage> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Checkout failed: $e')));
     }
   }
+
 }

@@ -11,6 +11,9 @@ class ProductBase(BaseModel):
     name: str = Field(..., description="Product name")
     price: float = Field(..., gt=0, description="Unit price")
     stock: int = Field(..., ge=0, description="Inventory count")
+    description: Optional[str] = Field(None, description="Menu description shown to customers")
+    category: Optional[str] = Field(None, description="Product category (e.g. Appetizers)")
+    image_url: Optional[str] = Field(None, description="Optional image asset or URL")
 
 
 class ProductCreate(ProductBase):
@@ -21,6 +24,9 @@ class ProductUpdate(BaseModel):
     name: Optional[str]
     price: Optional[float] = Field(None, gt=0)
     stock: Optional[int] = Field(None, ge=0)
+    description: Optional[str]
+    category: Optional[str]
+    image_url: Optional[str]
 
 
 class Product(ProductBase):
