@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../services/api_service.dart';
 import '../checkout/checkout_page.dart';
+import '../products/products_provider.dart';
 import 'cart_provider.dart';
 
 class CartPage extends StatefulWidget {
@@ -47,7 +48,7 @@ class _CartPageState extends State<CartPage> {
                         final item = cart.items[index];
                         return ListTile(
                           title: Text(item.product.name),
-                          subtitle: Text('KES ${item.product.price.toStringAsFixed(2)} x ${item.quantity}'),
+                          subtitle: Text('ZMW ${item.product.price.toStringAsFixed(2)} x ${item.quantity}'),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -96,19 +97,21 @@ class _CartPageState extends State<CartPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('Subtotal: KES ${cart.subtotal.toStringAsFixed(2)}'),
-        Text('Tax (~16%): KES ${cart.tax.toStringAsFixed(2)}'),
-        Text('Discount: KES ${cart.discount.toStringAsFixed(2)}'),
-        Text('Total (estimate): KES ${cart.total.toStringAsFixed(2)}'),
+        Text('Subtotal: ZMW ${cart.subtotal.toStringAsFixed(2)}'),
+        Text('Tax (~16%): ZMW ${cart.tax.toStringAsFixed(2)}'),
+        Text('Discount: ZMW ${cart.discount.toStringAsFixed(2)}'),
+        Text('Total (estimate): ZMW ${cart.total.toStringAsFixed(2)}'),
       ],
     );
   }
 
   Future<void> _performCheckout(BuildContext context, CartProvider cart) async {
     final api = context.read<ApiService>();
+    final productsProvider = context.read<ProductsProvider>();
     try {
+      final payload = await _prepareCheckoutPayload(cart, productsProvider);
       final receipt = await api.checkout(
-        cart.toCheckoutPayload(),
+        payload,
         discountPercent: cart.discountPercent,
       );
       if (!mounted) return;
@@ -120,5 +123,21 @@ class _CartPageState extends State<CartPage> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Checkout failed: $e')));
     }
+  }
+
+  Future<List<Map<String, dynamic>>> _prepareCheckoutPayload(
+    CartProvider cart,
+    ProductsProvider productsProvider,
+  ) async {
+    final payload = <Map<String, dynamic>>[];
+    for (final item in List<CartItem>.from(cart.items)) {
+      var product = item.product;
+      if (product.id < 0) {
+        product = await productsProvider.ensureRemoteProduct(product);
+        cart.replaceProduct(item.product, product);
+      }
+      payload.add({'product_id': product.id, 'qty': item.quantity});
+    }
+    return payload;
   }
 }

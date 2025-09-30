@@ -18,6 +18,8 @@ class CartProvider extends ChangeNotifier {
 
   List<CartItem> get items => _items.values.toList();
 
+  int quantityFor(Product product) => _items[product.id]?.quantity ?? 0;
+
   void add(Product product) {
     final item = _items[product.id];
     if (item != null) {
@@ -40,6 +42,15 @@ class CartProvider extends ChangeNotifier {
       _items[product.id] = CartItem(product: product, quantity: quantity);
     }
     notifyListeners();
+  }
+
+  void replaceProduct(Product oldProduct, Product newProduct) {
+    final existing = _items.remove(oldProduct.id);
+    if (existing != null) {
+      _items[newProduct.id] =
+          CartItem(product: newProduct, quantity: existing.quantity);
+      notifyListeners();
+    }
   }
 
   void clear() {
