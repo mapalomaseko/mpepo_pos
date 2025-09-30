@@ -373,6 +373,7 @@ class _CategoryGrid extends StatelessWidget {
                 ? 3
                 : width >= 600
                     ? 2
+mapalomaseko/update-app-theme-and-ui-components-mrxwdx
                     : 2;
         const horizontalPadding = 32.0;
         const spacing = 16.0;
