@@ -187,6 +187,7 @@ class ProductsProvider extends ChangeNotifier {
   }
 
   Future<void> deleteProduct(int id) async {
+    if (id < 0) return;
     try {
       if (id < 0) {
         final override = _staticOverrides.remove(id);
@@ -238,4 +239,23 @@ class ProductsProvider extends ChangeNotifier {
       imageUrl: fallback.imageUrl ?? remote.imageUrl,
     );
   }
+
+  List<Product> get products => List.unmodifiable(_products);
+
+  List<Product> productsForCategory(String category) {
+    final items = _products;
+    if (category == 'All') {
+      return items;
+    }
+    if (category == 'Extras & Drinks') {
+      return items
+          .where((product) =>
+              product.category == 'Extras' ||
+              product.category == 'Drinks' ||
+              product.category == 'Extras & Drinks')
+          .toList();
+    }
+    return items.where((product) => product.category == category).toList();
+  }
+
 }
