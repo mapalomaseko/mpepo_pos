@@ -16,6 +16,7 @@ class ProductsPage extends StatefulWidget {
 
 class _ProductsPageState extends State<ProductsPage> {
   static const _tabs = ['All', 'Appetizers', 'Main Courses', 'Extras & Drinks'];
+  static const _formCategories = ['Appetizers', 'Main Courses', 'Extras', 'Drinks'];
   final Map<int, int> _quantities = {};
 
   @override
@@ -261,74 +262,441 @@ class _ProductsPageState extends State<ProductsPage> {
   Future<void> _showProductDialog(BuildContext context, {int? productId}) async {
     final provider = context.read<ProductsProvider>();
     final product = productId != null ? provider.getById(productId) : null;
-    if (product != null && product.isStatic) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Preloaded menu items cannot be edited.')),
-      );
-      return;
-    }
-
     final nameController = TextEditingController(text: product?.name ?? '');
     final priceController = TextEditingController(text: product?.price.toString() ?? '');
     final stockController = TextEditingController(text: product?.stock.toString() ?? '');
+    final descriptionController =
+        TextEditingController(text: product?.description ?? '');
+    final imageController = TextEditingController(text: product?.imageUrl ?? '');
+    final categories = [..._formCategories];
+    if (product?.category != null &&
+        product!.category!.isNotEmpty &&
+        !categories.contains(product.category!)) {
+      categories.add(product.category!);
+    }
+    String selectedCategory =
+        product?.category?.isNotEmpty == true ? product!.category! : categories.first;
     final formKey = GlobalKey<FormState>();
 
     await showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: Text(product == null ? 'Add product' : 'Edit product'),
-          content: Form(
-            key: formKey,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  AppTextField(
-                    controller: nameController,
-                    label: 'Name',
-                    validator: (value) => value == null || value.isEmpty ? 'Enter name' : null,
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return AlertDialog(
+              title: Text(product == null ? 'Add product' : 'Edit product'),
+              content: Form(
+                key: formKey,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      AppTextField(
+                        controller: nameController,
+                        label: 'Name',
+                        validator: (value) => value == null || value.isEmpty ? 'Enter name' : null,
+                      ),
+                      const SizedBox(height: 12),
+                      DropdownButtonFormField<String>(
+                        value: selectedCategory,
+                        decoration: const InputDecoration(labelText: 'Category'),
+                        items: categories
+                            .map(
+                              (category) => DropdownMenuItem(
+                                value: category,
+                                child: Text(category),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (value) {
+                          if (value == null) return;
+                          setModalState(() => selectedCategory = value);
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      AppTextField(
+                        controller: priceController,
+                        label: 'Price',
+                        keyboardType: TextInputType.number,
+                        validator: (value) => value == null || value.isEmpty ? 'Enter price' : null,
+                      ),
+                      const SizedBox(height: 12),
+                      AppTextField(
+                        controller: stockController,
+                        label: 'Stock',
+                        keyboardType: TextInputType.number,
+                        validator: (value) => value == null || value.isEmpty ? 'Enter stock' : null,
+                      ),
+                      const SizedBox(height: 12),
+                      AppTextField(
+                        controller: descriptionController,
+                        label: 'Description',
+                        maxLines: 3,
+                      ),
+                      const SizedBox(height: 12),
+                      AppTextField(
+                        controller: imageController,
+                        label: 'Image path or URL',
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 12),
-                  AppTextField(
-                    controller: priceController,
-                    label: 'Price',
-                    keyboardType: TextInputType.number,
-                    validator: (value) => value == null || value.isEmpty ? 'Enter price' : null,
-                  ),
-                  const SizedBox(height: 12),
-                  AppTextField(
-                    controller: stockController,
-                    label: 'Stock',
-                    keyboardType: TextInputType.number,
-                    validator: (value) => value == null || value.isEmpty ? 'Enter stock' : null,
-                  ),
-                ],
+                ),
               ),
-            ),
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-            ElevatedButton(
-              onPressed: () async {
-                if (!formKey.currentState!.validate()) return;
-                final name = nameController.text;
-                final price = double.tryParse(priceController.text) ?? 0;
-                final stock = int.tryParse(stockController.text) ?? 0;
-                if (product == null) {
-                  await provider.createProduct(name, price, stock);
-                } else {
-                  await provider.saveProduct(
-                    product.copyWith(name: name, price: price, stock: stock),
-                  );
-                }
-                if (context.mounted) Navigator.pop(context);
-              },
-              child: const Text('Save'),
-            ),
-          ],
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (!formKey.currentState!.validate()) return;
+                    final name = nameController.text.trim();
+                    final price = double.tryParse(priceController.text) ?? 0;
+                    final stock = int.tryParse(stockController.text) ?? 0;
+                    final description = descriptionController.text.trim();
+                    final imagePath = imageController.text.trim();
+
+                    if (product == null) {
+                      await provider.createProduct(
+                        name: name,
+                        price: price,
+                        stock: stock,
+                        description: description.isEmpty ? null : description,
+                        category: selectedCategory,
+                        imageUrl: imagePath.isEmpty ? null : imagePath,
+                      );
+                    } else {
+                      await provider.saveProduct(
+                        product.copyWith(
+                          name: name,
+                          price: price,
+                          stock: stock,
+                          description: description.isEmpty ? null : description,
+                          category: selectedCategory,
+                          imageUrl: imagePath.isEmpty ? null : imagePath,
+                        ),
+                      );
+                    }
+                    if (context.mounted) Navigator.pop(context);
+                  },
+                  child: const Text('Save'),
+                ),
+              ],
+            );
+          },
         );
       },
+    );
+  }
+}
+
+class _CategoryGrid extends StatelessWidget {
+  const _CategoryGrid({
+    required this.category,
+    required this.provider,
+    required this.cart,
+    required this.onQuantityChanged,
+    required this.quantityBuilder,
+    required this.onEditProduct,
+    required this.onDeleteProduct,
+  });
+
+  final String category;
+  final ProductsProvider provider;
+  final CartProvider cart;
+  final void Function(int productId, int quantity) onQuantityChanged;
+  final int Function(int productId) quantityBuilder;
+  final void Function(Product product) onEditProduct;
+  final Future<void> Function(Product product) onDeleteProduct;
+
+  @override
+  Widget build(BuildContext context) {
+    final products = provider.productsForCategory(category);
+    if (products.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text('No items available in $category yet.'),
+        ),
+      );
+    }
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final crossAxisCount = _columnCountForWidth(width);
+        const horizontalPadding = 32.0;
+        const spacing = 16.0;
+        final bottomInset = MediaQuery.of(context).padding.bottom;
+        final usableWidth = width - horizontalPadding - (crossAxisCount - 1) * spacing;
+        final itemWidth = usableWidth > 0 ? usableWidth / crossAxisCount : width / crossAxisCount;
+        final cardHeight = _cardHeightForColumns(crossAxisCount);
+        final rawAspectRatio = itemWidth / cardHeight;
+        final clampedAspectRatio = rawAspectRatio.clamp(0.35, 1.1);
+
+        return RefreshIndicator(
+          onRefresh: () => provider.loadProducts(),
+          child: GridView.builder(
+            padding: EdgeInsets.fromLTRB(16, 16, 16, 176 + bottomInset),
+            itemCount: products.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              crossAxisSpacing: spacing,
+              mainAxisSpacing: spacing,
+              childAspectRatio: clampedAspectRatio.toDouble(),
+            ),
+            physics: const AlwaysScrollableScrollPhysics(),
+            itemBuilder: (context, index) {
+              final product = products[index];
+              final quantity = quantityBuilder(product.id);
+              final existingQuantity = cart.quantityFor(product);
+
+              return _ProductCard(
+                product: product,
+                quantity: quantity,
+                existingQuantity: existingQuantity,
+                onQuantityChanged: (value) => onQuantityChanged(product.id, value),
+                onAddToCart: () {
+                  final newQuantity = existingQuantity + quantity;
+                  cart.updateQuantity(product, newQuantity);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('${product.name} added to cart')),
+                  );
+                },
+                onEdit: () => onEditProduct(product),
+                onDelete: () {
+                  onDeleteProduct(product);
+                },
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  int _columnCountForWidth(double width) {
+    if (width >= 1200) {
+      return 4;
+    }
+    if (width >= 900) {
+      return 3;
+    }
+    return 2;
+  }
+
+  double _cardHeightForColumns(int columns) {
+    if (columns >= 4) {
+      return 360.0;
+    }
+    if (columns == 3) {
+      return 380.0;
+    }
+    return 420.0;
+  }
+}
+
+class _ProductCard extends StatelessWidget {
+  const _ProductCard({
+    required this.product,
+    required this.quantity,
+    required this.existingQuantity,
+    required this.onQuantityChanged,
+    required this.onAddToCart,
+    this.onEdit,
+    this.onDelete,
+  });
+
+  final Product product;
+  final int quantity;
+  final int existingQuantity;
+  final ValueChanged<int> onQuantityChanged;
+  final VoidCallback onAddToCart;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+
+    return Material(
+      color: theme.colorScheme.surface,
+      elevation: 2,
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onLongPress: onEdit,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: AspectRatio(
+                      aspectRatio: 4 / 3,
+                      child: _ProductImage(imageUrl: product.imageUrl),
+                    ),
+                  ),
+                  if (onEdit != null || onDelete != null)
+                    Positioned(
+                      top: 6,
+                      right: 6,
+                      child: Material(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(16),
+                        clipBehavior: Clip.antiAlias,
+                        child: PopupMenuButton<String>(
+                          padding: EdgeInsets.zero,
+                          icon: const Icon(Icons.more_vert, color: Colors.white, size: 20),
+                          onSelected: (value) {
+                            if (value == 'edit' && onEdit != null) {
+                              onEdit!();
+                            } else if (value == 'delete' && onDelete != null) {
+                              onDelete!();
+                            }
+                          },
+                          itemBuilder: (context) => [
+                            if (onEdit != null)
+                              const PopupMenuItem(value: 'edit', child: Text('Edit')),
+                            if (onDelete != null)
+                              const PopupMenuItem(value: 'delete', child: Text('Delete')),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      product.name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                    ),
+                    if (product.description != null) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        product.description!,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: textTheme.bodySmall?.copyWith(
+                          color: textTheme.bodySmall?.color?.withOpacity(0.7),
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 6),
+                    Text(
+                      'ZMW ${product.price.toStringAsFixed(2)}',
+                      style: textTheme.titleMedium?.copyWith(color: theme.colorScheme.primary),
+                    ),
+                    const Spacer(),
+                    Row(
+                      children: [
+                        _QuantityButton(
+                          icon: Icons.remove_circle_outline,
+                          onPressed: quantity > 1 ? () => onQuantityChanged(quantity - 1) : null,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Text('$quantity', style: textTheme.titleMedium),
+                        ),
+                        _QuantityButton(
+                          icon: Icons.add_circle_outline,
+                          onPressed: () => onQuantityChanged(quantity + 1),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.icon(
+                        icon: const Icon(Icons.shopping_cart_outlined),
+                        onPressed: onAddToCart,
+                        label: Text(
+                          existingQuantity > 0
+                              ? 'Update (${existingQuantity + quantity})'
+                              : 'Add to cart',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _QuantityButton extends StatelessWidget {
+  const _QuantityButton({required this.icon, required this.onPressed});
+
+  final IconData icon;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      visualDensity: VisualDensity.compact,
+      onPressed: onPressed,
+      icon: Icon(icon),
+    );
+  }
+}
+
+class _ProductImage extends StatelessWidget {
+  const _ProductImage({this.imageUrl});
+
+  final String? imageUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    if (imageUrl == null || imageUrl!.isEmpty) {
+      return _FallbackImage(name: 'No image');
+    }
+
+    if (imageUrl!.startsWith('assets/')) {
+      return Image.asset(
+        imageUrl!,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => _FallbackImage(name: imageUrl!),
+      );
+    }
+
+    return Image.network(
+      imageUrl!,
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) => _FallbackImage(name: imageUrl!),
+      loadingBuilder: (context, child, progress) {
+        if (progress == null) return child;
+        return const Center(child: CircularProgressIndicator());
+      },
+    );
+  }
+}
+
+class _FallbackImage extends StatelessWidget {
+  const _FallbackImage({required this.name});
+
+  final String name;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      color: theme.colorScheme.surfaceVariant,
+      child: Center(
+        child: Icon(Icons.image_not_supported, color: theme.colorScheme.onSurfaceVariant),
+      ),
     );
   }
 }

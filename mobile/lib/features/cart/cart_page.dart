@@ -109,7 +109,7 @@ class _CartPageState extends State<CartPage> {
     final api = context.read<ApiService>();
     final productsProvider = context.read<ProductsProvider>();
     try {
-      final payload = await _prepareCheckoutPayload(cart, productsProvider);
+      final payload = cart.toCheckoutPayload();
       final receipt = await api.checkout(
         payload,
         discountPercent: cart.discountPercent,
@@ -123,21 +123,5 @@ class _CartPageState extends State<CartPage> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Checkout failed: $e')));
     }
-  }
-
-  Future<List<Map<String, dynamic>>> _prepareCheckoutPayload(
-    CartProvider cart,
-    ProductsProvider productsProvider,
-  ) async {
-    final payload = <Map<String, dynamic>>[];
-    for (final item in List<CartItem>.from(cart.items)) {
-      var product = item.product;
-      if (product.id < 0) {
-        product = await productsProvider.ensureRemoteProduct(product);
-        cart.replaceProduct(item.product, product);
-      }
-      payload.add({'product_id': product.id, 'qty': item.quantity});
-    }
-    return payload;
   }
 }

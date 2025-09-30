@@ -2,12 +2,9 @@ import 'package:flutter/foundation.dart';
 
 import '../../data/models/product.dart';
 import '../../data/repositories/product_repository.dart';
-import '../../data/static_products.dart';
-
 class ProductsProvider extends ChangeNotifier {
   final ProductRepository repository;
-  List<Product> _remoteProducts = [];
-  final Map<int, Product> _staticOverrides = {};
+  List<Product> _products = [];
   bool isLoading = false;
   String? error;
 
@@ -17,8 +14,7 @@ class ProductsProvider extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
     try {
-      _remoteProducts = await repository.fetchProducts();
-      _reconcileStaticOverrides();
+      _products = await repository.fetchProducts();
       error = null;
     } catch (e) {
       error = e.toString();
@@ -28,11 +24,25 @@ class ProductsProvider extends ChangeNotifier {
     }
   }
 
-  Future<Product?> createProduct(String name, double price, int stock) async {
+  Future<Product?> createProduct({
+    required String name,
+    required double price,
+    required int stock,
+    String? description,
+    String? category,
+    String? imageUrl,
+  }) async {
     try {
-      final product = await repository.createProduct(name, price, stock);
-      _remoteProducts = [product, ..._remoteProducts];
-      _reconcileStaticOverrides();
+      final product = await repository.createProduct(
+        name: name,
+        price: price,
+        stock: stock,
+        description: description,
+        category: category,
+        imageUrl: imageUrl,
+      );
+      _products = [product, ..._products];
+      error = null;
       notifyListeners();
       return product;
     } catch (e) {
@@ -45,9 +55,8 @@ class ProductsProvider extends ChangeNotifier {
   Future<Product?> saveProduct(Product product) async {
     try {
       final updated = await repository.updateProduct(product);
-      _remoteProducts =
-          _remoteProducts.map((p) => p.id == updated.id ? updated : p).toList();
-      _reconcileStaticOverrides();
+      _products = _products.map((p) => p.id == updated.id ? updated : p).toList();
+      error = null;
       notifyListeners();
       return updated;
     } catch (e) {
@@ -61,8 +70,8 @@ class ProductsProvider extends ChangeNotifier {
     if (id < 0) return;
     try {
       await repository.deleteProduct(id);
-      _remoteProducts = _remoteProducts.where((p) => p.id != id).toList();
-      _staticOverrides.removeWhere((_, value) => value.id == id);
+      _products = _products.where((p) => p.id != id).toList();
+      error = null;
       notifyListeners();
     } catch (e) {
       error = e.toString();
@@ -110,24 +119,16 @@ class ProductsProvider extends ChangeNotifier {
   }
 
   Product? getById(int id) {
-    final combined = menuProducts;
-    for (final product in combined) {
+    for (final product in _products) {
       if (product.id == id) return product;
     }
     return null;
   }
 
-  List<Product> get menuProducts {
-    final overrideIds = _staticOverrides.values.map((p) => p.id).toSet();
-    final staticEntries = staticProducts
-        .map((product) => _staticOverrides[product.id] ?? product)
-        .toList();
-    final remotes = _remoteProducts.where((p) => !overrideIds.contains(p.id));
-    return [...staticEntries, ...remotes];
-  }
+  List<Product> get products => List.unmodifiable(_products);
 
   List<Product> productsForCategory(String category) {
-    final items = menuProducts;
+    final items = _products;
     if (category == 'All') {
       return items;
     }
@@ -142,37 +143,4 @@ class ProductsProvider extends ChangeNotifier {
     return items.where((product) => product.category == category).toList();
   }
 
-  void _reconcileStaticOverrides() {
-    final overrides = <int, Product>{};
-    final staticByName = {
-      for (final product in staticProducts) product.name.toLowerCase(): product
-    };
-
-    _remoteProducts = _remoteProducts.map((remote) {
-      final template = staticByName[remote.name.toLowerCase()];
-      if (template == null) {
-        return remote;
-      }
-      final merged = _mergeProduct(remote, template);
-      overrides[template.id] = merged;
-      return merged;
-    }).toList();
-
-    _staticOverrides
-      ..clear()
-      ..addAll(overrides);
-  }
-
-  Product _mergeProduct(Product remote, Product template) {
-    return Product(
-      id: remote.id,
-      name: remote.name,
-      price: remote.price,
-      stock: remote.stock,
-      createdAt: remote.createdAt,
-      description: template.description ?? remote.description,
-      category: template.category ?? remote.category,
-      imageUrl: template.imageUrl ?? remote.imageUrl,
-    );
-  }
 }

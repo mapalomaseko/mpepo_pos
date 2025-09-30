@@ -5,6 +5,7 @@ class AppTextField extends StatelessWidget {
   final String label;
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
+  final int maxLines;
 
   const AppTextField({
     super.key,
@@ -12,6 +13,7 @@ class AppTextField extends StatelessWidget {
     required this.label,
     this.keyboardType = TextInputType.text,
     this.validator,
+    this.maxLines = 1,
   });
 
   @override
@@ -19,6 +21,7 @@ class AppTextField extends StatelessWidget {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
+      maxLines: maxLines,
       decoration: InputDecoration(labelText: label),
       validator: validator,
     );
