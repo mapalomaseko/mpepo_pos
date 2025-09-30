@@ -196,6 +196,7 @@ class ProductsProvider extends ChangeNotifier {
   }
 
   Future<void> deleteProduct(int id) async {
+    if (id < 0) return;
     try {
       if (id < 0) {
         final override = _staticOverrides.remove(id);
@@ -253,4 +254,5 @@ class ProductsProvider extends ChangeNotifier {
       imageUrl: fallback.imageUrl ?? remote.imageUrl,
     );
   }
+
 }

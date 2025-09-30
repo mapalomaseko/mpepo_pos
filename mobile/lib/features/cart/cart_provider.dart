@@ -44,6 +44,15 @@ class CartProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void replaceProduct(Product oldProduct, Product newProduct) {
+    final existing = _items.remove(oldProduct.id);
+    if (existing != null) {
+      _items[newProduct.id] =
+          CartItem(product: newProduct, quantity: existing.quantity);
+      notifyListeners();
+    }
+  }
+
   void clear() {
     _items.clear();
     discountPercent = 0;
