@@ -1,6 +1,8 @@
 BEGIN TRANSACTION;
 
-CREATE TABLE IF NOT EXISTS products (
+DROP TABLE IF EXISTS products;
+
+CREATE TABLE products (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
   price REAL NOT NULL,
@@ -10,12 +12,6 @@ CREATE TABLE IF NOT EXISTS products (
   image_url TEXT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
-
-ALTER TABLE products ADD COLUMN IF NOT EXISTS description TEXT;
-ALTER TABLE products ADD COLUMN IF NOT EXISTS category TEXT;
-ALTER TABLE products ADD COLUMN IF NOT EXISTS image_url TEXT;
-
-DELETE FROM products;
 
 INSERT INTO products (name, price, stock, description, category, image_url)
 VALUES
