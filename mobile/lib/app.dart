@@ -93,8 +93,7 @@ ThemeData _buildTheme() {
       elevation: 0,
       centerTitle: false,
     ),
-    tabBarTheme: TabBarThemeData( 
-      main
+    tabBarTheme: TabBarThemeData(
       labelColor: colorScheme.onPrimary,
       unselectedLabelColor: colorScheme.onPrimary.withOpacity(0.7),
       indicatorColor: colorScheme.onPrimary,
