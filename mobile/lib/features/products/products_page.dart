@@ -420,7 +420,6 @@ class _CategoryGrid extends StatelessWidget {
     );
   }
 
-
   int _columnCountForWidth(double width) {
     if (width >= 1200) {
       return 4;
@@ -517,57 +516,65 @@ class _ProductCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 10),
-              Text(
-                product.name,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-              ),
-              if (product.description != null) ...[
-                const SizedBox(height: 4),
-                Text(
-                  product.description!,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: textTheme.bodySmall
-                      ?.copyWith(color: textTheme.bodySmall?.color?.withOpacity(0.7)),
-                ),
-              ],
-              const SizedBox(height: 8),
-              Text(
-                'ZMW ${product.price.toStringAsFixed(2)}',
-                style: textTheme.titleMedium?.copyWith(color: theme.colorScheme.primary),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  _QuantityButton(
-                    icon: Icons.remove_circle_outline,
-                    onPressed: quantity > 1 ? () => onQuantityChanged(quantity - 1) : null,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Text('$quantity', style: textTheme.titleMedium),
-                  ),
-                  _QuantityButton(
-                    icon: Icons.add_circle_outline,
-                    onPressed: () => onQuantityChanged(quantity + 1),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton.icon(
-                  icon: const Icon(Icons.shopping_cart_outlined),
-                  onPressed: onAddToCart,
-                  label: Text(
-                    existingQuantity > 0
-                        ? 'Update (${existingQuantity + quantity})'
-                        : 'Add to cart',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      product.name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                    ),
+                    if (product.description != null) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        product.description!,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: textTheme.bodySmall?.copyWith(
+                          color: textTheme.bodySmall?.color?.withOpacity(0.7),
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 6),
+                    Text(
+                      'ZMW ${product.price.toStringAsFixed(2)}',
+                      style: textTheme.titleMedium?.copyWith(color: theme.colorScheme.primary),
+                    ),
+                    const Spacer(),
+                    Row(
+                      children: [
+                        _QuantityButton(
+                          icon: Icons.remove_circle_outline,
+                          onPressed: quantity > 1 ? () => onQuantityChanged(quantity - 1) : null,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Text('$quantity', style: textTheme.titleMedium),
+                        ),
+                        _QuantityButton(
+                          icon: Icons.add_circle_outline,
+                          onPressed: () => onQuantityChanged(quantity + 1),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.icon(
+                        icon: const Icon(Icons.shopping_cart_outlined),
+                        onPressed: onAddToCart,
+                        label: Text(
+                          existingQuantity > 0
+                              ? 'Update (${existingQuantity + quantity})'
+                              : 'Add to cart',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

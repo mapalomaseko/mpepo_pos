@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../services/api_service.dart';
 import '../checkout/checkout_page.dart';
+import '../products/products_provider.dart';
 import 'cart_provider.dart';
 
 class CartPage extends StatefulWidget {
@@ -106,9 +107,11 @@ class _CartPageState extends State<CartPage> {
 
   Future<void> _performCheckout(BuildContext context, CartProvider cart) async {
     final api = context.read<ApiService>();
+    final productsProvider = context.read<ProductsProvider>();
     try {
+      final payload = await _prepareCheckoutPayload(cart, productsProvider);
       final receipt = await api.checkout(
-        cart.toCheckoutPayload(),
+        payload,
         discountPercent: cart.discountPercent,
       );
       if (!mounted) return;
@@ -120,5 +123,21 @@ class _CartPageState extends State<CartPage> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Checkout failed: $e')));
     }
+  }
+
+  Future<List<Map<String, dynamic>>> _prepareCheckoutPayload(
+    CartProvider cart,
+    ProductsProvider productsProvider,
+  ) async {
+    final payload = <Map<String, dynamic>>[];
+    for (final item in List<CartItem>.from(cart.items)) {
+      var product = item.product;
+      if (product.id < 0) {
+        product = await productsProvider.ensureRemoteProduct(product);
+        cart.replaceProduct(item.product, product);
+      }
+      payload.add({'product_id': product.id, 'qty': item.quantity});
+    }
+    return payload;
   }
 }
