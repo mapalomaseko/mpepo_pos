@@ -367,24 +367,13 @@ class _CategoryGrid extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
-        final crossAxisCount = width >= 1200
-            ? 4
-            : width >= 900
-                ? 3
-                : width >= 600
-                    ? 2
-mapalomaseko/update-app-theme-and-ui-components-mrxwdx
-                    : 2;
+        final crossAxisCount = _columnCountForWidth(width);
         const horizontalPadding = 32.0;
         const spacing = 16.0;
         final bottomInset = MediaQuery.of(context).padding.bottom;
         final usableWidth = width - horizontalPadding - (crossAxisCount - 1) * spacing;
         final itemWidth = usableWidth > 0 ? usableWidth / crossAxisCount : width / crossAxisCount;
-        final cardHeight = crossAxisCount >= 4
-            ? 360.0
-            : crossAxisCount == 3
-                ? 380.0
-                : 420.0;
+        final cardHeight = _cardHeightForColumns(crossAxisCount);
         final rawAspectRatio = itemWidth / cardHeight;
         final clampedAspectRatio = rawAspectRatio.clamp(0.35, 1.1);
 
@@ -429,6 +418,27 @@ mapalomaseko/update-app-theme-and-ui-components-mrxwdx
         );
       },
     );
+  }
+
+
+  int _columnCountForWidth(double width) {
+    if (width >= 1200) {
+      return 4;
+    }
+    if (width >= 900) {
+      return 3;
+    }
+    return 2;
+  }
+
+  double _cardHeightForColumns(int columns) {
+    if (columns >= 4) {
+      return 360.0;
+    }
+    if (columns == 3) {
+      return 380.0;
+    }
+    return 420.0;
   }
 }
 
