@@ -5,20 +5,25 @@ import '../../data/repositories/product_repository.dart';
 import '../../data/static_catalog.dart';
 
 class ProductsProvider extends ChangeNotifier {
-  ProductsProvider(this.repository);
+  ProductsProvider(this.repository) {
+    _recomputeProducts();
+  }
 
   final ProductRepository repository;
 
   final Map<int, Product> _staticOverrides = {};
   List<Product> _remoteProducts = [];
 
+  List<Product> _resolvedProducts = [];
+
   bool isLoading = false;
   String? error;
 
-  List<Product> get products => List.unmodifiable(_buildResolvedProducts());
+  List<Product> get products => List.unmodifiable(_resolvedProducts);
 
   List<Product> productsForCategory(String category) {
-    final items = _buildResolvedProducts();
+    final items = _resolvedProducts;
+
     if (category == 'All') {
       return items;
     }
@@ -34,7 +39,7 @@ class ProductsProvider extends ChangeNotifier {
   }
 
   Product? getById(int id) {
-    for (final product in products) {
+    for (final product in _resolvedProducts) {
       if (product.id == id) return product;
     }
     return null;
@@ -75,6 +80,7 @@ class ProductsProvider extends ChangeNotifier {
     notifyListeners();
     try {
       _remoteProducts = await repository.fetchProducts();
+      _recomputeProducts();
       error = null;
     } catch (e) {
       error = e.toString();
@@ -102,6 +108,7 @@ class ProductsProvider extends ChangeNotifier {
         imageUrl: imageUrl,
       );
       _remoteProducts = [created, ..._remoteProducts];
+      _recomputeProducts();
       error = null;
       notifyListeners();
       return created;
@@ -165,6 +172,7 @@ class ProductsProvider extends ChangeNotifier {
         }
 
         _staticOverrides[product.id] = resolved;
+        _recomputeProducts();
         error = null;
         notifyListeners();
         return resolved;
@@ -178,6 +186,7 @@ class ProductsProvider extends ChangeNotifier {
           _staticOverrides[entry.key] = updated;
         }
       }
+      _recomputeProducts();
       error = null;
       notifyListeners();
       return updated;
@@ -198,6 +207,7 @@ class ProductsProvider extends ChangeNotifier {
           _remoteProducts =
               _remoteProducts.where((product) => product.id != override.id).toList();
         }
+        _recomputeProducts();
         error = null;
         notifyListeners();
         return;
@@ -211,12 +221,18 @@ class ProductsProvider extends ChangeNotifier {
           _staticOverrides.remove(entry.key);
         }
       }
+      _recomputeProducts();
       error = null;
       notifyListeners();
     } catch (e) {
       error = e.toString();
       notifyListeners();
     }
+  }
+
+
+  void _recomputeProducts() {
+    _resolvedProducts = _buildResolvedProducts();
   }
 
   Product? _findRemoteMatch(String name) {
