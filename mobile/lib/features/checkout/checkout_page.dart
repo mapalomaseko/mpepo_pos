@@ -30,17 +30,17 @@ class CheckoutPage extends StatelessWidget {
                   final item = receipt.items[index];
                   return ListTile(
                     title: Text(item.name),
-                    subtitle: Text('${item.qty} x KES ${item.unitPrice.toStringAsFixed(2)}'),
-                    trailing: Text('KES ${item.lineTotal.toStringAsFixed(2)}'),
+                    subtitle: Text('${item.qty} x ZMW ${item.unitPrice.toStringAsFixed(2)}'),
+                    trailing: Text('ZMW ${item.lineTotal.toStringAsFixed(2)}'),
                   );
                 },
               ),
             ),
             const SizedBox(height: 12),
-            Text('Subtotal: KES ${receipt.subtotal.toStringAsFixed(2)}'),
-            Text('Tax: KES ${receipt.tax.toStringAsFixed(2)}'),
-            Text('Discount: KES ${receipt.discount.toStringAsFixed(2)}'),
-            Text('Total: KES ${receipt.total.toStringAsFixed(2)}', style: Theme.of(context).textTheme.titleMedium),
+            Text('Subtotal: ZMW ${receipt.subtotal.toStringAsFixed(2)}'),
+            Text('Tax: ZMW ${receipt.tax.toStringAsFixed(2)}'),
+            Text('Discount: ZMW ${receipt.discount.toStringAsFixed(2)}'),
+            Text('Total: ZMW ${receipt.total.toStringAsFixed(2)}', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
