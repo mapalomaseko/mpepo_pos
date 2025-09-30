@@ -347,6 +347,7 @@ class _ProductsPageState extends State<ProductsPage> {
                 TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
                 ElevatedButton(
                   onPressed: () async {
+                    final navigator = Navigator.of(context);
                     if (!formKey.currentState!.validate()) return;
                     final name = nameController.text.trim();
                     final price = double.tryParse(priceController.text) ?? 0;
@@ -375,7 +376,7 @@ class _ProductsPageState extends State<ProductsPage> {
                         ),
                       );
                     }
-                    if (context.mounted) Navigator.pop(context);
+                    if (navigator.mounted) navigator.pop();
                   },
                   child: const Text('Save'),
                 ),
@@ -615,7 +616,7 @@ class _ProductCard extends StatelessWidget {
                     const SizedBox(height: 6),
                     SizedBox(
                       width: double.infinity,
-                      child: FilledButton.icon(
+                      child: ElevatedButton.icon(
                         icon: const Icon(Icons.shopping_cart_outlined),
                         onPressed: onAddToCart,
                         label: Text(

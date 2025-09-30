@@ -13,7 +13,6 @@ class ProductsProvider extends ChangeNotifier {
 
   final Map<int, Product> _staticOverrides = {};
   List<Product> _remoteProducts = [];
-
   List<Product> _resolvedProducts = [];
 
   bool isLoading = false;
@@ -23,7 +22,6 @@ class ProductsProvider extends ChangeNotifier {
 
   List<Product> productsForCategory(String category) {
     final items = _resolvedProducts;
-
     if (category == 'All') {
       return items;
     }
@@ -230,7 +228,6 @@ class ProductsProvider extends ChangeNotifier {
     }
   }
 
-
   void _recomputeProducts() {
     _resolvedProducts = _buildResolvedProducts();
   }
@@ -256,24 +253,6 @@ class ProductsProvider extends ChangeNotifier {
       category: fallback.category ?? remote.category,
       imageUrl: fallback.imageUrl ?? remote.imageUrl,
     );
-  }
-
-  List<Product> get products => List.unmodifiable(_products);
-
-  List<Product> productsForCategory(String category) {
-    final items = _products;
-    if (category == 'All') {
-      return items;
-    }
-    if (category == 'Extras & Drinks') {
-      return items
-          .where((product) =>
-              product.category == 'Extras' ||
-              product.category == 'Drinks' ||
-              product.category == 'Extras & Drinks')
-          .toList();
-    }
-    return items.where((product) => product.category == category).toList();
   }
 
 }

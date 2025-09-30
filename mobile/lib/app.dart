@@ -110,13 +110,6 @@ ThemeData _buildTheme() {
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
       ),
     ),
-    filledButtonTheme: FilledButtonThemeData(
-      style: FilledButton.styleFrom(
-        backgroundColor: colorScheme.primary,
-        foregroundColor: colorScheme.onPrimary,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      ),
-    ),
     navigationBarTheme: NavigationBarThemeData(
       backgroundColor: colorScheme.surface,
       indicatorColor: colorScheme.primary.withOpacity(0.15),
