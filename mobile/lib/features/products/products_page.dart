@@ -44,84 +44,94 @@ class _ProductsPageState extends State<ProductsPage> {
             tabs: _tabs.map((label) => Tab(text: label)).toList(),
           ),
         ),
-        body: Stack(
-          children: [
-            Column(
-              children: [
-                if (productsProvider.isLoading)
-                  const LinearProgressIndicator(minHeight: 2),
-                Expanded(
-                  child: TabBarView(
-                    children: _tabs
-                        .map(
-                          (category) => _CategoryGrid(
-                            category: category,
-                            provider: productsProvider,
-                            cart: cart,
-                            onQuantityChanged: _updateQuantity,
-                            quantityBuilder: _getQuantity,
-                            onEditProduct: (product) => _showProductDialog(
-                              context,
-                              productId: product.id,
-                            ),
-                            onDeleteProduct: _confirmDelete,
-                          ),
-                        )
-                        .toList(),
-                  ),
-                ),
-              ],
-            ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: IgnorePointer(
-                  ignoring: !hasItemsInCart,
-                  child: AnimatedOpacity(
-                    duration: const Duration(milliseconds: 250),
-                    opacity: hasItemsInCart ? 1 : 0,
-                    child: AnimatedSlide(
-                      duration: const Duration(milliseconds: 250),
-                      offset: hasItemsInCart ? Offset.zero : const Offset(0, 1),
-                      child: GestureDetector(
-                        onTap: hasItemsInCart ? () => _showCartSummary(context) : null,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.primary,
-                            borderRadius: BorderRadius.circular(24),
-                            boxShadow: [
-                              BoxShadow(
-                                color: theme.colorScheme.primary.withOpacity(0.3),
-                                blurRadius: 18,
-                                offset: const Offset(0, 8),
+        body: SafeArea(
+          top: false,
+          child: Stack(
+            children: [
+              Column(
+                children: [
+                  if (productsProvider.isLoading)
+                    const LinearProgressIndicator(minHeight: 2),
+                  Expanded(
+                    child: TabBarView(
+                      children: _tabs
+                          .map(
+                            (category) => _CategoryGrid(
+                              category: category,
+                              provider: productsProvider,
+                              cart: cart,
+                              onQuantityChanged: _updateQuantity,
+                              quantityBuilder: _getQuantity,
+                              onEditProduct: (product) => _showProductDialog(
+                                context,
+                                productId: product.id,
                               ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.shopping_bag, color: Colors.white),
-                              const SizedBox(width: 12),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    '$cartItemCount item${cartItemCount == 1 ? '' : 's'} in cart',
-                                    style: theme.textTheme.titleMedium
-                                        ?.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
-                                  ),
-                                  Text(
-                                    'Total: KES ${cart.total.toStringAsFixed(2)}',
-                                    style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white70),
+                              onDeleteProduct: _confirmDelete,
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  ),
+                ],
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: SafeArea(
+                  top: false,
+                  left: false,
+                  right: false,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: IgnorePointer(
+                      ignoring: !hasItemsInCart,
+                      child: AnimatedOpacity(
+                        duration: const Duration(milliseconds: 250),
+                        opacity: hasItemsInCart ? 1 : 0,
+                        child: AnimatedSlide(
+                          duration: const Duration(milliseconds: 250),
+                          offset: hasItemsInCart ? Offset.zero : const Offset(0, 1),
+                          child: GestureDetector(
+                            onTap: hasItemsInCart ? () => _showCartSummary(context) : null,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.primary,
+                                borderRadius: BorderRadius.circular(24),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: theme.colorScheme.primary.withOpacity(0.3),
+                                    blurRadius: 18,
+                                    offset: const Offset(0, 8),
                                   ),
                                 ],
                               ),
-                              const SizedBox(width: 12),
-                              const Icon(Icons.keyboard_arrow_up, color: Colors.white),
-                            ],
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.shopping_bag, color: Colors.white),
+                                  const SizedBox(width: 12),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        '$cartItemCount item${cartItemCount == 1 ? '' : 's'} in cart',
+                                        style: theme.textTheme.titleMedium?.copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      Text(
+                                        'Total: KES ${cart.total.toStringAsFixed(2)}',
+                                        style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white70),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(width: 12),
+                                  const Icon(Icons.keyboard_arrow_up, color: Colors.white),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -129,8 +139,8 @@ class _ProductsPageState extends State<ProductsPage> {
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -354,44 +364,71 @@ class _CategoryGrid extends StatelessWidget {
       );
     }
 
-    return RefreshIndicator(
-      onRefresh: () => provider.loadProducts(),
-      child: GridView.builder(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 120),
-        itemCount: products.length,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio: 0.72,
-        ),
-        physics: const AlwaysScrollableScrollPhysics(),
-        itemBuilder: (context, index) {
-          final product = products[index];
-          final quantity = quantityBuilder(product.id);
-          final existingQuantity = cart.quantityFor(product);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final crossAxisCount = width >= 1200
+            ? 4
+            : width >= 900
+                ? 3
+                : width >= 600
+                    ? 2
+                    : width >= 420
+                        ? 2
+                        : 1;
+        const horizontalPadding = 32.0;
+        const spacing = 16.0;
+        final bottomInset = MediaQuery.of(context).padding.bottom;
+        final usableWidth = width - horizontalPadding - (crossAxisCount - 1) * spacing;
+        final itemWidth = usableWidth > 0 ? usableWidth / crossAxisCount : width / crossAxisCount;
+        final cardHeight = crossAxisCount >= 3
+            ? 360.0
+            : crossAxisCount == 2
+                ? 380.0
+                : 340.0;
+        final rawAspectRatio = itemWidth / cardHeight;
+        final clampedAspectRatio = rawAspectRatio.clamp(0.45, 1.1);
 
-          return _ProductCard(
-            product: product,
-            quantity: quantity,
-            existingQuantity: existingQuantity,
-            onQuantityChanged: (value) => onQuantityChanged(product.id, value),
-            onAddToCart: () {
-              final newQuantity = existingQuantity + quantity;
-              cart.updateQuantity(product, newQuantity);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('${product.name} added to cart')),
+        return RefreshIndicator(
+          onRefresh: () => provider.loadProducts(),
+          child: GridView.builder(
+            padding: EdgeInsets.fromLTRB(16, 16, 16, 176 + bottomInset),
+            itemCount: products.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              crossAxisSpacing: spacing,
+              mainAxisSpacing: spacing,
+              childAspectRatio: clampedAspectRatio.toDouble(),
+            ),
+            physics: const AlwaysScrollableScrollPhysics(),
+            itemBuilder: (context, index) {
+              final product = products[index];
+              final quantity = quantityBuilder(product.id);
+              final existingQuantity = cart.quantityFor(product);
+
+              return _ProductCard(
+                product: product,
+                quantity: quantity,
+                existingQuantity: existingQuantity,
+                onQuantityChanged: (value) => onQuantityChanged(product.id, value),
+                onAddToCart: () {
+                  final newQuantity = existingQuantity + quantity;
+                  cart.updateQuantity(product, newQuantity);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('${product.name} added to cart')),
+                  );
+                },
+                onEdit: product.isStatic ? null : () => onEditProduct(product),
+                onDelete: product.isStatic
+                    ? null
+                    : () {
+                        onDeleteProduct(product);
+                      },
               );
             },
-            onEdit: product.isStatic ? null : () => onEditProduct(product),
-            onDelete: product.isStatic
-                ? null
-                : () {
-                    onDeleteProduct(product);
-                  },
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }
@@ -432,11 +469,43 @@ class _ProductCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: _ProductImage(imageUrl: product.imageUrl),
-                ),
+              Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: AspectRatio(
+                      aspectRatio: 4 / 3,
+                      child: _ProductImage(imageUrl: product.imageUrl),
+                    ),
+                  ),
+                  if (onEdit != null || onDelete != null)
+                    Positioned(
+                      top: 6,
+                      right: 6,
+                      child: Material(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(16),
+                        clipBehavior: Clip.antiAlias,
+                        child: PopupMenuButton<String>(
+                          padding: EdgeInsets.zero,
+                          icon: const Icon(Icons.more_vert, color: Colors.white, size: 20),
+                          onSelected: (value) {
+                            if (value == 'edit' && onEdit != null) {
+                              onEdit!();
+                            } else if (value == 'delete' && onDelete != null) {
+                              onDelete!();
+                            }
+                          },
+                          itemBuilder: (context) => [
+                            if (onEdit != null)
+                              const PopupMenuItem(value: 'edit', child: Text('Edit')),
+                            if (onDelete != null)
+                              const PopupMenuItem(value: 'delete', child: Text('Delete')),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
               ),
               const SizedBox(height: 12),
               Text(
@@ -445,18 +514,22 @@ class _ProductCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
               ),
-              const SizedBox(height: 4),
-              if (product.description != null)
+              if (product.description != null) ...[
+                const SizedBox(height: 4),
                 Text(
                   product.description!,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: textTheme.bodySmall?.copyWith(color: textTheme.bodySmall?.color?.withOpacity(0.7)),
+                  style: textTheme.bodySmall
+                      ?.copyWith(color: textTheme.bodySmall?.color?.withOpacity(0.7)),
                 ),
+              ],
               const SizedBox(height: 8),
-              Text('KES ${product.price.toStringAsFixed(2)}',
-                  style: textTheme.titleMedium?.copyWith(color: theme.colorScheme.primary)),
-              const SizedBox(height: 8),
+              Text(
+                'KES ${product.price.toStringAsFixed(2)}',
+                style: textTheme.titleMedium?.copyWith(color: theme.colorScheme.primary),
+              ),
+              const SizedBox(height: 12),
               Row(
                 children: [
                   _QuantityButton(
@@ -473,36 +546,21 @@ class _ProductCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               SizedBox(
                 width: double.infinity,
                 child: FilledButton.icon(
                   icon: const Icon(Icons.shopping_cart_outlined),
                   onPressed: onAddToCart,
-                  label: Text(existingQuantity > 0
-                      ? 'Update (${existingQuantity + quantity})'
-                      : 'Add to cart'),
-                ),
-              ),
-              if (onEdit != null || onDelete != null)
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: PopupMenuButton<String>(
-                    onSelected: (value) {
-                      if (value == 'edit' && onEdit != null) {
-                        onEdit!();
-                      } else if (value == 'delete' && onDelete != null) {
-                        onDelete!();
-                      }
-                    },
-                    itemBuilder: (context) => [
-                      if (onEdit != null)
-                        const PopupMenuItem(value: 'edit', child: Text('Edit')),
-                      if (onDelete != null)
-                        const PopupMenuItem(value: 'delete', child: Text('Delete')),
-                    ],
+                  label: Text(
+                    existingQuantity > 0
+                        ? 'Update (${existingQuantity + quantity})'
+                        : 'Add to cart',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
+              ),
             ],
           ),
         ),
