@@ -7,6 +7,10 @@ from typing import List, Optional
 from pydantic import BaseModel, Field, validator
 
 
+# -----------------------------
+# Product Schemas
+# -----------------------------
+
 class ProductBase(BaseModel):
     name: str = Field(..., description="Product name")
     price: float = Field(..., gt=0, description="Unit price")
@@ -37,6 +41,10 @@ class Product(ProductBase):
         orm_mode = True
 
 
+# -----------------------------
+# Checkout & Receipt Schemas
+# -----------------------------
+
 class CheckoutItem(BaseModel):
     product_id: int
     qty: int = Field(..., gt=0, description="Quantity being purchased")
@@ -49,7 +57,7 @@ class CheckoutRequest(BaseModel):
     discount_percent: Optional[float] = Field(0, ge=0, le=100)
 
     @validator("items")
-    def validate_items(cls, value: List[CheckoutItem]):  # noqa: D417 - simple validator
+    def validate_items(cls, value: List[CheckoutItem]):  # noqa: D417
         if not value:
             raise ValueError("Cart must contain at least one item")
         return value
@@ -76,12 +84,23 @@ class Receipt(BaseModel):
         orm_mode = True
 
 
+# -----------------------------
+# Invoice Schemas
+# -----------------------------
+
 class InvoicePayload(BaseModel):
     receipt_id: int
     merchant: str
     items: List[ReceiptItem]
     totals: dict
     timestamp: datetime
+
+    class Config:
+        orm_mode = True
+        # ✅ This makes sure datetimes are converted to ISO strings when exporting
+        json_encoders = {
+            datetime: lambda v: v.isoformat()
+        }
 
 
 class AuthorityResponse(BaseModel):
@@ -105,6 +124,10 @@ class Invoice(BaseModel):
 class InvoiceList(BaseModel):
     invoices: List[Invoice]
 
+
+# -----------------------------
+# Reporting Schema
+# -----------------------------
 
 class DailyReport(BaseModel):
     date: date
