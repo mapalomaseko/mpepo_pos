@@ -1,3 +1,22 @@
+BEGIN TRANSACTION;
+
+CREATE TABLE IF NOT EXISTS products (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  price REAL NOT NULL,
+  stock INTEGER NOT NULL DEFAULT 0,
+  description TEXT,
+  category TEXT,
+  image_url TEXT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+ALTER TABLE products ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS category TEXT;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS image_url TEXT;
+
+DELETE FROM products;
+
 INSERT INTO products (name, price, stock, description, category, image_url)
 VALUES
   (
@@ -96,3 +115,5 @@ VALUES
     'Drinks',
     'assets/images/chibuku.jpg'
   );
+
+COMMIT;
