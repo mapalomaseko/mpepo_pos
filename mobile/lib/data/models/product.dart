@@ -4,13 +4,19 @@ class Product {
   final double price;
   final int stock;
   final DateTime createdAt;
+  final String? description;
+  final String? category;
+  final String? imageUrl;
 
-  Product({
+  const Product({
     required this.id,
     required this.name,
     required this.price,
     required this.stock,
     required this.createdAt,
+    this.description,
+    this.category,
+    this.imageUrl,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -20,6 +26,9 @@ class Product {
       price: (json['price'] as num).toDouble(),
       stock: json['stock'] as int,
       createdAt: DateTime.parse(json['created_at'] as String),
+      description: json['description'] as String?,
+      category: json['category'] as String?,
+      imageUrl: json['image_url'] as String?,
     );
   }
 
@@ -33,13 +42,23 @@ class Product {
     };
   }
 
-  Product copyWith({String? name, double? price, int? stock}) {
+  Product copyWith({
+    String? name,
+    double? price,
+    int? stock,
+    String? description,
+    String? category,
+    String? imageUrl,
+  }) {
     return Product(
       id: id,
       name: name ?? this.name,
       price: price ?? this.price,
       stock: stock ?? this.stock,
       createdAt: createdAt,
+      description: description ?? this.description,
+      category: category ?? this.category,
+      imageUrl: imageUrl ?? this.imageUrl,
     );
   }
 }

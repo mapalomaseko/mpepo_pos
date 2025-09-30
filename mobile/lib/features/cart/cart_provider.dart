@@ -18,6 +18,8 @@ class CartProvider extends ChangeNotifier {
 
   List<CartItem> get items => _items.values.toList();
 
+  int quantityFor(Product product) => _items[product.id]?.quantity ?? 0;
+
   void add(Product product) {
     final item = _items[product.id];
     if (item != null) {

@@ -54,9 +54,9 @@ class ReportsPage extends StatelessWidget {
                     children: [
                       Text('Receipts: ${report['receipt_count']}'),
                       const SizedBox(height: 8),
-                      Text('Total sales: KES ${(report['total_sales'] as num).toStringAsFixed(2)}'),
+                      Text('Total sales: ZMW ${(report['total_sales'] as num).toStringAsFixed(2)}'),
                       const SizedBox(height: 8),
-                      Text('Total tax: KES ${(report['total_tax'] as num).toStringAsFixed(2)}'),
+                      Text('Total tax: ZMW ${(report['total_tax'] as num).toStringAsFixed(2)}'),
                     ],
                   ),
                 ),

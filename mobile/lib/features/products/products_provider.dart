@@ -2,10 +2,9 @@ import 'package:flutter/foundation.dart';
 
 import '../../data/models/product.dart';
 import '../../data/repositories/product_repository.dart';
-
 class ProductsProvider extends ChangeNotifier {
   final ProductRepository repository;
-  List<Product> products = [];
+  List<Product> _products = [];
   bool isLoading = false;
   String? error;
 
@@ -15,7 +14,7 @@ class ProductsProvider extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
     try {
-      products = await repository.fetchProducts();
+      _products = await repository.fetchProducts();
       error = null;
     } catch (e) {
       error = e.toString();
@@ -25,10 +24,25 @@ class ProductsProvider extends ChangeNotifier {
     }
   }
 
-  Future<Product?> createProduct(String name, double price, int stock) async {
+  Future<Product?> createProduct({
+    required String name,
+    required double price,
+    required int stock,
+    String? description,
+    String? category,
+    String? imageUrl,
+  }) async {
     try {
-      final product = await repository.createProduct(name, price, stock);
-      products = [product, ...products];
+      final product = await repository.createProduct(
+        name: name,
+        price: price,
+        stock: stock,
+        description: description,
+        category: category,
+        imageUrl: imageUrl,
+      );
+      _products = [product, ..._products];
+      error = null;
       notifyListeners();
       return product;
     } catch (e) {
@@ -41,7 +55,8 @@ class ProductsProvider extends ChangeNotifier {
   Future<Product?> saveProduct(Product product) async {
     try {
       final updated = await repository.updateProduct(product);
-      products = products.map((p) => p.id == updated.id ? updated : p).toList();
+      _products = _products.map((p) => p.id == updated.id ? updated : p).toList();
+      error = null;
       notifyListeners();
       return updated;
     } catch (e) {
@@ -54,7 +69,8 @@ class ProductsProvider extends ChangeNotifier {
   Future<void> deleteProduct(int id) async {
     try {
       await repository.deleteProduct(id);
-      products = products.where((p) => p.id != id).toList();
+      _products = _products.where((p) => p.id != id).toList();
+      error = null;
       notifyListeners();
     } catch (e) {
       error = e.toString();
@@ -63,10 +79,28 @@ class ProductsProvider extends ChangeNotifier {
   }
 
   Product? getById(int id) {
-    try {
-      return products.firstWhere((element) => element.id == id);
-    } catch (_) {
-      return null;
+    for (final product in _products) {
+      if (product.id == id) return product;
     }
+    return null;
   }
+
+  List<Product> get products => List.unmodifiable(_products);
+
+  List<Product> productsForCategory(String category) {
+    final items = _products;
+    if (category == 'All') {
+      return items;
+    }
+    if (category == 'Extras & Drinks') {
+      return items
+          .where((product) =>
+              product.category == 'Extras' ||
+              product.category == 'Drinks' ||
+              product.category == 'Extras & Drinks')
+          .toList();
+    }
+    return items.where((product) => product.category == category).toList();
+  }
+
 }
