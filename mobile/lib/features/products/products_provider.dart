@@ -13,6 +13,7 @@ class ProductsProvider extends ChangeNotifier {
 
   final Map<int, Product> _staticOverrides = {};
   List<Product> _remoteProducts = [];
+
   List<Product> _resolvedProducts = [];
 
   bool isLoading = false;
@@ -22,6 +23,7 @@ class ProductsProvider extends ChangeNotifier {
 
   List<Product> productsForCategory(String category) {
     final items = _resolvedProducts;
+
     if (category == 'All') {
       return items;
     }
@@ -196,6 +198,7 @@ class ProductsProvider extends ChangeNotifier {
   }
 
   Future<void> deleteProduct(int id) async {
+    if (id < 0) return;
     try {
       if (id < 0) {
         final override = _staticOverrides.remove(id);
@@ -227,6 +230,7 @@ class ProductsProvider extends ChangeNotifier {
     }
   }
 
+
   void _recomputeProducts() {
     _resolvedProducts = _buildResolvedProducts();
   }
@@ -253,4 +257,23 @@ class ProductsProvider extends ChangeNotifier {
       imageUrl: fallback.imageUrl ?? remote.imageUrl,
     );
   }
+
+  List<Product> get products => List.unmodifiable(_products);
+
+  List<Product> productsForCategory(String category) {
+    final items = _products;
+    if (category == 'All') {
+      return items;
+    }
+    if (category == 'Extras & Drinks') {
+      return items
+          .where((product) =>
+              product.category == 'Extras' ||
+              product.category == 'Drinks' ||
+              product.category == 'Extras & Drinks')
+          .toList();
+    }
+    return items.where((product) => product.category == category).toList();
+  }
+
 }
