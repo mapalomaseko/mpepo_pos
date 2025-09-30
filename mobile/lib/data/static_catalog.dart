@@ -1,6 +1,6 @@
 import 'models/product.dart';
 
-const List<Product> kStaticProducts = [
+final List<Product> kStaticProducts = List.unmodifiable([
   Product(
     id: -1,
     name: 'Vitumbuwa',
@@ -124,4 +124,4 @@ const List<Product> kStaticProducts = [
     category: 'Drinks',
     imageUrl: 'assets/images/chibuku.jpg',
   ),
-];
+]);

@@ -15,7 +15,32 @@ class ProductsProvider extends ChangeNotifier {
   bool isLoading = false;
   String? error;
 
-  List<Product> get products {
+  List<Product> get products => List.unmodifiable(_buildResolvedProducts());
+
+  List<Product> productsForCategory(String category) {
+    final items = _buildResolvedProducts();
+    if (category == 'All') {
+      return items;
+    }
+    if (category == 'Extras & Drinks') {
+      return items
+          .where((product) =>
+              product.category == 'Extras' ||
+              product.category == 'Drinks' ||
+              product.category == 'Extras & Drinks')
+          .toList();
+    }
+    return items.where((product) => product.category == category).toList();
+  }
+
+  Product? getById(int id) {
+    for (final product in products) {
+      if (product.id == id) return product;
+    }
+    return null;
+  }
+
+  List<Product> _buildResolvedProducts() {
     final resolved = <Product>[];
     final consumedRemoteIds = <int>{};
 
@@ -42,30 +67,7 @@ class ProductsProvider extends ChangeNotifier {
         .where((product) => !consumedRemoteIds.contains(product.id))
         .toList();
 
-    return List.unmodifiable([...resolved, ...remoteRemainder]);
-  }
-
-  List<Product> productsForCategory(String category) {
-    final items = products;
-    if (category == 'All') {
-      return items;
-    }
-    if (category == 'Extras & Drinks') {
-      return items
-          .where((product) =>
-              product.category == 'Extras' ||
-              product.category == 'Drinks' ||
-              product.category == 'Extras & Drinks')
-          .toList();
-    }
-    return items.where((product) => product.category == category).toList();
-  }
-
-  Product? getById(int id) {
-    for (final product in products) {
-      if (product.id == id) return product;
-    }
-    return null;
+    return [...resolved, ...remoteRemainder];
   }
 
   Future<void> loadProducts() async {
