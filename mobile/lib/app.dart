@@ -73,14 +73,60 @@ class _SmartPosAppState extends State<SmartPosApp> {
       ],
       child: MaterialApp(
         title: 'Mpepo Smart POS',
-        theme: ThemeData(
-          primarySwatch: Colors.orange,
-          useMaterial3: true,
-        ),
+        theme: _buildTheme(),
         home: const _HomePage(),
       ),
     );
   }
+}
+
+ThemeData _buildTheme() {
+  const seed = Color(0xFFFF6F00);
+  final colorScheme = ColorScheme.fromSeed(seedColor: seed);
+  return ThemeData(
+    useMaterial3: true,
+    colorScheme: colorScheme,
+    scaffoldBackgroundColor: colorScheme.surface,
+    appBarTheme: AppBarTheme(
+      backgroundColor: colorScheme.primary,
+      foregroundColor: colorScheme.onPrimary,
+      elevation: 0,
+      centerTitle: false,
+    ),
+    tabBarTheme: TabBarThemeData(
+      labelColor: colorScheme.onPrimary,
+      unselectedLabelColor: colorScheme.onPrimary.withOpacity(0.7),
+      indicatorColor: colorScheme.onPrimary,
+    ),
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      backgroundColor: colorScheme.secondary,
+      foregroundColor: colorScheme.onSecondary,
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+      ),
+    ),
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      ),
+    ),
+    navigationBarTheme: NavigationBarThemeData(
+      backgroundColor: colorScheme.surface,
+      indicatorColor: colorScheme.primary.withOpacity(0.15),
+      labelTextStyle: MaterialStateProperty.resolveWith(
+        (states) => TextStyle(
+          fontWeight: states.contains(MaterialState.selected) ? FontWeight.w600 : FontWeight.w500,
+        ),
+      ),
+    ),
+  );
 }
 
 class _HomePage extends StatefulWidget {
