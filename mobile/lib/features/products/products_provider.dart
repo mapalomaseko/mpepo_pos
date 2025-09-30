@@ -67,6 +67,7 @@ class ProductsProvider extends ChangeNotifier {
   }
 
   Future<void> deleteProduct(int id) async {
+    if (id < 0) return;
     try {
       await repository.deleteProduct(id);
       _products = _products.where((p) => p.id != id).toList();
@@ -76,6 +77,45 @@ class ProductsProvider extends ChangeNotifier {
       error = e.toString();
       notifyListeners();
     }
+  }
+
+  Future<Product> ensureRemoteProduct(Product product) async {
+    if (product.id > 0) {
+      return product;
+    }
+
+    final existingOverride = _staticOverrides[product.id];
+    if (existingOverride != null) {
+      return existingOverride;
+    }
+
+    Product? matchedRemote;
+    for (final remote in _remoteProducts) {
+      if (remote.name.toLowerCase() == product.name.toLowerCase()) {
+        matchedRemote = remote;
+        break;
+      }
+    }
+
+    Product resolved;
+    if (matchedRemote != null) {
+      resolved = _mergeProduct(matchedRemote, product);
+      _remoteProducts = _remoteProducts
+          .map((p) => p.id == resolved.id ? resolved : p)
+          .toList();
+    } else {
+      final created = await repository.createProduct(
+        product.name,
+        product.price,
+        product.stock,
+      );
+      resolved = _mergeProduct(created, product);
+      _remoteProducts = [resolved, ..._remoteProducts];
+    }
+
+    _staticOverrides[product.id] = resolved;
+    notifyListeners();
+    return resolved;
   }
 
   Product? getById(int id) {

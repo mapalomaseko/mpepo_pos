@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../services/api_service.dart';
 import '../checkout/checkout_page.dart';
+import '../products/products_provider.dart';
 import 'cart_provider.dart';
 
 class CartPage extends StatefulWidget {
@@ -106,6 +107,7 @@ class _CartPageState extends State<CartPage> {
 
   Future<void> _performCheckout(BuildContext context, CartProvider cart) async {
     final api = context.read<ApiService>();
+    final productsProvider = context.read<ProductsProvider>();
     try {
       final payload = cart.toCheckoutPayload();
       final receipt = await api.checkout(
@@ -122,5 +124,4 @@ class _CartPageState extends State<CartPage> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Checkout failed: $e')));
     }
   }
-
 }
