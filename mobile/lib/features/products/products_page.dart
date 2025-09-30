@@ -122,7 +122,7 @@ class _ProductsPageState extends State<ProductsPage> {
                                         ),
                                       ),
                                       Text(
-                                        'Total: KES ${cart.total.toStringAsFixed(2)}',
+                                        'Total: ZMW ${cart.total.toStringAsFixed(2)}',
                                         style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white70),
                                       ),
                                     ],
@@ -221,10 +221,10 @@ class _ProductsPageState extends State<ProductsPage> {
                             return ListTile(
                               title: Text(item.product.name),
                               subtitle: Text(
-                                'KES ${item.product.price.toStringAsFixed(2)} x ${item.quantity}',
+                                'ZMW ${item.product.price.toStringAsFixed(2)} x ${item.quantity}',
                               ),
                               trailing: Text(
-                                'KES ${item.lineTotal.toStringAsFixed(2)}',
+                                'ZMW ${item.lineTotal.toStringAsFixed(2)}',
                                 style: theme.textTheme.titleMedium,
                               ),
                             );
@@ -232,7 +232,7 @@ class _ProductsPageState extends State<ProductsPage> {
                         ),
                 ),
                 const SizedBox(height: 12),
-                Text('Total: KES ${cart.total.toStringAsFixed(2)}',
+                Text('Total: ZMW ${cart.total.toStringAsFixed(2)}',
                     style:
                         theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
                 const SizedBox(height: 12),
@@ -373,21 +373,20 @@ class _CategoryGrid extends StatelessWidget {
                 ? 3
                 : width >= 600
                     ? 2
-                    : width >= 420
-                        ? 2
-                        : 1;
+mapalomaseko/update-app-theme-and-ui-components-mrxwdx
+                    : 2;
         const horizontalPadding = 32.0;
         const spacing = 16.0;
         final bottomInset = MediaQuery.of(context).padding.bottom;
         final usableWidth = width - horizontalPadding - (crossAxisCount - 1) * spacing;
         final itemWidth = usableWidth > 0 ? usableWidth / crossAxisCount : width / crossAxisCount;
-        final cardHeight = crossAxisCount >= 3
+        final cardHeight = crossAxisCount >= 4
             ? 360.0
-            : crossAxisCount == 2
+            : crossAxisCount == 3
                 ? 380.0
-                : 340.0;
+                : 420.0;
         final rawAspectRatio = itemWidth / cardHeight;
-        final clampedAspectRatio = rawAspectRatio.clamp(0.45, 1.1);
+        final clampedAspectRatio = rawAspectRatio.clamp(0.35, 1.1);
 
         return RefreshIndicator(
           onRefresh: () => provider.loadProducts(),
@@ -507,7 +506,7 @@ class _ProductCard extends StatelessWidget {
                     ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               Text(
                 product.name,
                 maxLines: 2,
@@ -526,10 +525,10 @@ class _ProductCard extends StatelessWidget {
               ],
               const SizedBox(height: 8),
               Text(
-                'KES ${product.price.toStringAsFixed(2)}',
+                'ZMW ${product.price.toStringAsFixed(2)}',
                 style: textTheme.titleMedium?.copyWith(color: theme.colorScheme.primary),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               Row(
                 children: [
                   _QuantityButton(
@@ -546,7 +545,7 @@ class _ProductCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               SizedBox(
                 width: double.infinity,
                 child: FilledButton.icon(
