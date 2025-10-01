@@ -223,8 +223,13 @@ class _PopularProductsChart extends StatelessWidget {
             x: entry.key,
             barRods: [
               BarChartRodData(
+                fromY: 0,
                 toY: entry.value.quantitySold.toDouble(),
-                borderRadius: BorderRadius.circular(8),
+                width: 20,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(8),
+                  topRight: Radius.circular(8),
+                ),
                 gradient: LinearGradient(
                   colors: [
                     theme.colorScheme.secondary,
@@ -251,10 +256,15 @@ class _PopularProductsChart extends StatelessWidget {
               height: 240,
               child: BarChart(
                 BarChartData(
-                  alignment: BarChartAlignment.spaceAround,
+                  alignment: BarChartAlignment.spaceEvenly,
                   maxY: (maxY == 0 ? 1 : maxY.toDouble() * 1.2),
-                  gridData: FlGridData(show: true, drawVerticalLine: false),
+                  gridData: FlGridData(
+                    show: true,
+                    drawVerticalLine: false,
+                    horizontalInterval: maxY <= 5 ? 1 : null,
+                  ),
                   borderData: FlBorderData(show: false),
+                  groupsSpace: 24,
                   titlesData: FlTitlesData(
                     topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                     rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
