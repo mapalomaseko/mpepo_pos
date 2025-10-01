@@ -215,6 +215,7 @@ class _PopularProductsChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final maxQuantity = data.fold<int>(1, (previous, element) => math.max(previous, element.quantitySold));
+    
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
