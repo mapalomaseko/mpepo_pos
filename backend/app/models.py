@@ -51,3 +51,22 @@ class Invoice(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
     receipt = relationship("Receipt", back_populates="invoices")
+    tax_response = relationship(
+        "TaxAuthorityResponse",
+        back_populates="invoice",
+        cascade="all, delete-orphan",
+        uselist=False,
+    )
+
+
+class TaxAuthorityResponse(Base):
+    """Individual responses returned by the tax authority."""
+
+    __tablename__ = "tax_authority_responses"
+
+    id = Column(Integer, primary_key=True, index=True)
+    invoice_id = Column(Integer, ForeignKey("invoices.id"), nullable=False, unique=True)
+    response_json = Column(Text, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+    invoice = relationship("Invoice", back_populates="tax_response")

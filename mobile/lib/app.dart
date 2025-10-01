@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import 'data/repositories/invoice_repository.dart';
 import 'data/repositories/product_repository.dart';
 import 'data/repositories/report_repository.dart';
+import 'features/auth/auth_provider.dart';
+import 'features/auth/login_page.dart';
 import 'features/cart/cart_page.dart';
 import 'features/cart/cart_provider.dart';
 import 'features/invoices/invoices_page.dart';
@@ -46,6 +48,9 @@ class _SmartPosAppState extends State<SmartPosApp> {
         Provider<ApiService>.value(value: widget.apiService),
         Provider<QueueService>.value(value: widget.queueService),
         Provider<ConnectivityService>.value(value: widget.connectivityService),
+        ChangeNotifierProvider<AuthProvider>(
+          create: (_) => AuthProvider(),
+        ),
         ProxyProvider<ApiService, ProductRepository>(
           update: (_, api, __) => ProductRepository(api),
         ),
@@ -71,10 +76,14 @@ class _SmartPosAppState extends State<SmartPosApp> {
           create: (context) => ReportsProvider(context.read<ReportRepository>())..loadReport(),
         ),
       ],
-      child: MaterialApp(
-        title: 'Mpepo Smart POS',
-        theme: _buildTheme(),
-        home: const _HomePage(),
+      child: Consumer<AuthProvider>(
+        builder: (context, auth, _) {
+          return MaterialApp(
+            title: 'Mpepo Smart POS',
+            theme: _buildTheme(),
+            home: auth.isAuthenticated ? const _HomePage() : const LoginPage(),
+          );
+        },
       ),
     );
   }
@@ -155,6 +164,11 @@ class _HomePageState extends State<_HomePage> {
           NavigationDestination(icon: Icon(Icons.receipt_long), label: 'Invoices'),
           NavigationDestination(icon: Icon(Icons.bar_chart), label: 'Reports'),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => context.read<AuthProvider>().logout(),
+        icon: const Icon(Icons.logout),
+        label: const Text('Logout'),
       ),
     );
   }
