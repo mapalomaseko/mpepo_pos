@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../services/api_service.dart';
 import '../checkout/checkout_page.dart';
 import '../products/products_provider.dart';
+import '../reports/reports_provider.dart';
 import 'cart_provider.dart';
 
 class CartPage extends StatefulWidget {
@@ -119,6 +120,9 @@ class _CartPageState extends State<CartPage> {
         MaterialPageRoute(builder: (_) => CheckoutPage(receipt: receipt)),
       );
       cart.clear();
+      if (mounted) {
+        context.read<ReportsProvider>().loadReport();
+      }
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Checkout failed: $e')));

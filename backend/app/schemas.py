@@ -1,7 +1,7 @@
 """Pydantic schemas for request and response bodies."""
 from __future__ import annotations
 
-from datetime import datetime, date
+from datetime import date, datetime
 from typing import List, Optional
 
 from pydantic import BaseModel, Field, validator
@@ -109,6 +109,16 @@ class AuthorityResponse(BaseModel):
     received_at: Optional[str] = None
 
 
+class TaxAuthorityResponseRecord(BaseModel):
+    id: int
+    invoice_id: int
+    response: dict
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
 class Invoice(BaseModel):
     id: int
     receipt_id: int
@@ -116,6 +126,7 @@ class Invoice(BaseModel):
     authority_response_json: Optional[dict]
     status: str
     created_at: datetime
+    tax_authority_response: Optional[TaxAuthorityResponseRecord] = None
 
     class Config:
         orm_mode = True
@@ -129,8 +140,22 @@ class InvoiceList(BaseModel):
 # Reporting Schema
 # -----------------------------
 
+class SalesByDay(BaseModel):
+    date: date
+    total_sales: float
+
+
+class PopularProduct(BaseModel):
+    product_id: int
+    name: str
+    quantity_sold: int
+    total_sales: float
+
+
 class DailyReport(BaseModel):
     date: date
     receipt_count: int
     total_sales: float
     total_tax: float
+    sales_by_day: List[SalesByDay] = Field(default_factory=list)
+    popular_products: List[PopularProduct] = Field(default_factory=list)
