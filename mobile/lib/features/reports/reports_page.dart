@@ -214,30 +214,7 @@ class _PopularProductsChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final maxY = data.fold<int>(0, (previous, element) => math.max(previous, element.quantitySold));
-    final barGroups = data
-        .asMap()
-        .entries
-        .map(
-          (entry) => BarChartGroupData(
-            x: entry.key,
-            barRods: [
-              BarChartRodData(
-                toY: entry.value.quantitySold.toDouble(),
-                borderRadius: BorderRadius.circular(8),
-                gradient: LinearGradient(
-                  colors: [
-                    theme.colorScheme.secondary,
-                    theme.colorScheme.primary,
-                  ],
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topCenter,
-                ),
-              ),
-            ],
-          ),
-        )
-        .toList();
+    final maxQuantity = data.fold<int>(1, (previous, element) => math.max(previous, element.quantitySold));
 
     return Card(
       child: Padding(
@@ -247,62 +224,79 @@ class _PopularProductsChart extends StatelessWidget {
           children: [
             Text('Top products', style: theme.textTheme.titleMedium),
             const SizedBox(height: 16),
-            SizedBox(
-              height: 240,
-              child: BarChart(
-                BarChartData(
-                  alignment: BarChartAlignment.spaceAround,
-                  maxY: (maxY == 0 ? 1 : maxY.toDouble() * 1.2),
-                  gridData: FlGridData(show: true, drawVerticalLine: false),
-                  borderData: FlBorderData(show: false),
-                  titlesData: FlTitlesData(
-                    topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        reservedSize: 40,
-                        getTitlesWidget: (value, meta) => Text(
-                          value.toStringAsFixed(0),
-                          style: theme.textTheme.bodySmall,
-                        ),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final barHeight = 28.0;
+                final spacing = 20.0;
+                return Column(
+                  children: data.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final product = entry.value;
+                    final fillFraction = product.quantitySold <= 0
+                        ? 0.0
+                        : (product.quantitySold / maxQuantity).clamp(0.0, 1.0);
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: index == data.length - 1 ? 0 : spacing),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Stack(
+                            children: [
+                              Container(
+                                height: barHeight,
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.surfaceVariant.withOpacity(0.6),
+                                  borderRadius: BorderRadius.circular(barHeight / 2),
+                                ),
+                              ),
+                              FractionallySizedBox(
+                                widthFactor: fillFraction,
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 300),
+                                  height: barHeight,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(barHeight / 2),
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        theme.colorScheme.secondary,
+                                        theme.colorScheme.primary,
+                                      ],
+                                      begin: Alignment.centerLeft,
+                                      end: Alignment.centerRight,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  product.name,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: theme.textTheme.bodyMedium,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                'Sold: ${product.quantitySold}',
+                                style: theme.textTheme.labelLarge?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: theme.colorScheme.primary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        getTitlesWidget: (value, meta) {
-                          final index = value.toInt();
-                          if (index < 0 || index >= data.length) {
-                            return const SizedBox.shrink();
-                          }
-                          final label = data[index].name;
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: Text(
-                              label.length > 10 ? '${label.substring(0, 10)}…' : label,
-                              style: theme.textTheme.bodySmall,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  barGroups: barGroups,
-                  barTouchData: BarTouchData(
-                    enabled: true,
-                    touchTooltipData: BarTouchTooltipData(
-                      getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                        final product = data[groupIndex];
-                        return BarTooltipItem(
-                          '${product.name}\nSold: ${product.quantitySold}\nSales: ZMW ${product.totalSales.toStringAsFixed(2)}',
-                          theme.textTheme.bodyMedium!,
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ),
+                    );
+                  }).toList(),
+                );
+              },
             ),
           ],
         ),

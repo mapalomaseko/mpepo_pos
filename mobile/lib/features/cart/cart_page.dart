@@ -95,14 +95,87 @@ class _CartPageState extends State<CartPage> {
   }
 
   Widget _buildTotals(CartProvider cart) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text('Subtotal: ZMW ${cart.subtotal.toStringAsFixed(2)}'),
-        Text('Tax (~16%): ZMW ${cart.tax.toStringAsFixed(2)}'),
-        Text('Discount: ZMW ${cart.discount.toStringAsFixed(2)}'),
-        Text('Total (estimate): ZMW ${cart.total.toStringAsFixed(2)}'),
-      ],
+    final theme = Theme.of(context);
+    final mutedColor = theme.colorScheme.onSurface.withOpacity(0.65);
+    final labelStyle = theme.textTheme.bodyMedium?.copyWith(color: mutedColor) ??
+        TextStyle(color: mutedColor, fontSize: 14);
+    final valueStyle =
+        theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600) ??
+            TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: theme.colorScheme.onSurface);
+    String format(double value) => 'ZMW ${value.toStringAsFixed(2)}';
+
+    Widget buildLine(String label, double value) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: labelStyle),
+          Text(format(value), style: valueStyle),
+        ],
+      );
+    }
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceVariant.withOpacity(0.55),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: theme.colorScheme.outline.withOpacity(0.2)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            buildLine('Subtotal', cart.subtotal),
+            const SizedBox(height: 8),
+            buildLine('Tax (~16%)', cart.tax),
+            const SizedBox(height: 8),
+            buildLine('Discount', cart.discount),
+            const SizedBox(height: 16),
+            const Divider(height: 24),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Total (estimate)',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ) ??
+                            TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Includes tax and discounts',
+                        style: theme.textTheme.bodySmall?.copyWith(color: mutedColor) ??
+                            TextStyle(color: mutedColor, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+                Text(
+                  format(cart.total),
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.w700,
+                      ) ??
+                      TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                        color: theme.colorScheme.primary,
+                      ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -114,6 +187,22 @@ class _CartPageState extends State<CartPage> {
       final receipt = await api.checkout(
         payload,
         discountPercent: cart.discountPercent,
+      );
+      if (!mounted) return;
+      await showDialog<void>(
+        context: context,
+        builder: (dialogContext) {
+          return AlertDialog(
+            title: const Text('Checkout successful'),
+            content: const Text('The transaction was completed successfully.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: const Text('View receipt'),
+              ),
+            ],
+          );
+        },
       );
       if (!mounted) return;
       await Navigator.of(context).push(
