@@ -79,6 +79,7 @@ class _SmartPosAppState extends State<SmartPosApp> {
       child: Consumer<AuthProvider>(
         builder: (context, auth, _) {
           return MaterialApp(
+            debugShowCheckedModeBanner: false,
             title: 'Mpepo Smart POS',
             theme: _buildTheme(),
             home: auth.isAuthenticated ? const _HomePage() : const LoginPage(),
