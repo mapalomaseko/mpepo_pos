@@ -596,7 +596,7 @@ class _ProductCard extends StatelessWidget {
                       'ZMW ${product.price.toStringAsFixed(2)}',
                       style: textTheme.titleMedium?.copyWith(color: theme.colorScheme.primary),
                     ),
-                    const Spacer(),
+                    const SizedBox(height: 12),
                     Row(
                       children: [
                         _QuantityButton(
