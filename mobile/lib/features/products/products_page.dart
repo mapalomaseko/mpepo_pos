@@ -574,34 +574,45 @@ class _ProductCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      product.name,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-                    ),
-                    if (product.description != null) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        product.description!,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: textTheme.bodySmall?.copyWith(
-                          color: textTheme.bodySmall?.color?.withOpacity(0.7),
-                        ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            product.name,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style:
+                                textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                          ),
+                          if (product.description != null) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              product.description!,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: textTheme.bodySmall?.copyWith(
+                                color: textTheme.bodySmall?.color?.withOpacity(0.7),
+                              ),
+                            ),
+                          ],
+                          const SizedBox(height: 6),
+                          Text(
+                            'ZMW ${product.price.toStringAsFixed(2)}',
+                            style:
+                                textTheme.titleMedium?.copyWith(color: theme.colorScheme.primary),
+                          ),
+                        ],
                       ),
-                    ],
-                    const SizedBox(height: 6),
-                    Text(
-                      'ZMW ${product.price.toStringAsFixed(2)}',
-                      style: textTheme.titleMedium?.copyWith(color: theme.colorScheme.primary),
                     ),
                     const SizedBox(height: 12),
                     Row(
                       children: [
                         _QuantityButton(
                           icon: Icons.remove_circle_outline,
-                          onPressed: quantity > 1 ? () => onQuantityChanged(quantity - 1) : null,
+                          onPressed: quantity > 1
+                              ? () => onQuantityChanged(quantity - 1)
+                              : null,
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
