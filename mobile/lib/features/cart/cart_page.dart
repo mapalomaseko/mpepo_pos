@@ -116,6 +116,22 @@ class _CartPageState extends State<CartPage> {
         discountPercent: cart.discountPercent,
       );
       if (!mounted) return;
+      await showDialog<void>(
+        context: context,
+        builder: (dialogContext) {
+          return AlertDialog(
+            title: const Text('Checkout successful'),
+            content: const Text('The transaction was completed successfully.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: const Text('View receipt'),
+              ),
+            ],
+          );
+        },
+      );
+      if (!mounted) return;
       await Navigator.of(context).push(
         MaterialPageRoute(builder: (_) => CheckoutPage(receipt: receipt)),
       );
