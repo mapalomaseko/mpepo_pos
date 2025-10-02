@@ -31,7 +31,7 @@ final List<Product> kStaticProducts = List.unmodifiable([
     createdAt: DateTime.utc(2024, 1, 1),
     description: 'Crispy triangular pastries filled with spiced minced meat or vegetables.',
     category: 'Appetizers',
-    imageUrl: 'assets/images/samosas.jpg',
+    imageUrl: 'assets/images/samosas.jpeg',
   ),
   Product(
     id: -4,
