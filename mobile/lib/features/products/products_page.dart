@@ -544,27 +544,22 @@ class _ProductCard extends StatelessWidget {
                     Positioned(
                       top: 6,
                       right: 6,
-                      child: Material(
-                        color: Colors.black54,
-                        borderRadius: BorderRadius.circular(16),
-                        clipBehavior: Clip.antiAlias,
-                        child: PopupMenuButton<String>(
-                          padding: EdgeInsets.zero,
-                          icon: const Icon(Icons.more_vert, color: Colors.white, size: 20),
-                          onSelected: (value) {
-                            if (value == 'edit' && onEdit != null) {
-                              onEdit!();
-                            } else if (value == 'delete' && onDelete != null) {
-                              onDelete!();
-                            }
-                          },
-                          itemBuilder: (context) => [
-                            if (onEdit != null)
-                              const PopupMenuItem(value: 'edit', child: Text('Edit')),
-                            if (onDelete != null)
-                              const PopupMenuItem(value: 'delete', child: Text('Delete')),
-                          ],
-                        ),
+                      child: PopupMenuButton<String>(
+                        padding: EdgeInsets.zero,
+                        icon: const Icon(Icons.more_vert, color: Colors.black87, size: 22),
+                        onSelected: (value) {
+                          if (value == 'edit' && onEdit != null) {
+                            onEdit!();
+                          } else if (value == 'delete' && onDelete != null) {
+                            onDelete!();
+                          }
+                        },
+                        itemBuilder: (context) => [
+                          if (onEdit != null)
+                            const PopupMenuItem(value: 'edit', child: Text('Edit')),
+                          if (onDelete != null)
+                            const PopupMenuItem(value: 'delete', child: Text('Delete')),
+                        ],
                       ),
                     ),
                 ],
@@ -574,34 +569,45 @@ class _ProductCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      product.name,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-                    ),
-                    if (product.description != null) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        product.description!,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: textTheme.bodySmall?.copyWith(
-                          color: textTheme.bodySmall?.color?.withOpacity(0.7),
-                        ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            product.name,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style:
+                                textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                          ),
+                          if (product.description != null) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              product.description!,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: textTheme.bodySmall?.copyWith(
+                                color: textTheme.bodySmall?.color?.withOpacity(0.7),
+                              ),
+                            ),
+                          ],
+                          const SizedBox(height: 6),
+                          Text(
+                            'ZMW ${product.price.toStringAsFixed(2)}',
+                            style:
+                                textTheme.titleMedium?.copyWith(color: theme.colorScheme.primary),
+                          ),
+                        ],
                       ),
-                    ],
-                    const SizedBox(height: 6),
-                    Text(
-                      'ZMW ${product.price.toStringAsFixed(2)}',
-                      style: textTheme.titleMedium?.copyWith(color: theme.colorScheme.primary),
                     ),
-                    const Spacer(),
+                    const SizedBox(height: 12),
                     Row(
                       children: [
                         _QuantityButton(
                           icon: Icons.remove_circle_outline,
-                          onPressed: quantity > 1 ? () => onQuantityChanged(quantity - 1) : null,
+                          onPressed: quantity > 1
+                              ? () => onQuantityChanged(quantity - 1)
+                              : null,
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
