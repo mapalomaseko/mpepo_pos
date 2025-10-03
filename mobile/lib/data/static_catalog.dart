@@ -10,7 +10,7 @@ final List<Product> kStaticProducts = List.unmodifiable([
     description:
         'Sweet fried dough balls made from flour, sugar, and yeast, perfect as a starter or snack.',
     category: 'Appetizers',
-    imageUrl: 'assets/images/vitumbuwa.jpg',
+    imageUrl: 'assets/images/vitumbuwa.jpeg',
   ),
   Product(
     id: -2,
@@ -21,7 +21,7 @@ final List<Product> kStaticProducts = List.unmodifiable([
     description:
         'Traditional Zambian "African polony" made from wild orchid tubers, peanuts, and spices.',
     category: 'Appetizers',
-    imageUrl: 'assets/images/chikanda.jpg',
+    imageUrl: 'assets/images/chikanda.jpeg',
   ),
   Product(
     id: -3,
@@ -42,7 +42,7 @@ final List<Product> kStaticProducts = List.unmodifiable([
     description:
         'Traditional staple made from maize meal served with grilled chicken and seasonal greens.',
     category: 'Main Courses',
-    imageUrl: 'assets/images/nshima_chicken.jpg',
+    imageUrl: 'assets/images/nshima_veggies.jpeg',
   ),
   Product(
     id: -5,
@@ -52,7 +52,7 @@ final List<Product> kStaticProducts = List.unmodifiable([
     createdAt: DateTime.utc(2024, 1, 1),
     description: 'Grilled T-bone steak accompanied by nshima and tomato-onion relish.',
     category: 'Main Courses',
-    imageUrl: 'assets/images/tbone_nshima.jpg',
+    imageUrl: 'assets/images/nshima_tbone.jpeg',
   ),
   Product(
     id: -6,
@@ -62,7 +62,7 @@ final List<Product> kStaticProducts = List.unmodifiable([
     createdAt: DateTime.utc(2024, 1, 1),
     description: 'Creamy peanut and vegetable stew served with nshima.',
     category: 'Main Courses',
-    imageUrl: 'assets/images/ifisashi.jpg',
+    imageUrl: 'assets/images/ifisashi.jpeg',
   ),
   Product(
     id: -7,
@@ -72,7 +72,7 @@ final List<Product> kStaticProducts = List.unmodifiable([
     createdAt: DateTime.utc(2024, 1, 1),
     description: 'Steamed pumpkin leaves cooked with tomatoes, onions, and groundnuts.',
     category: 'Extras',
-    imageUrl: 'assets/images/kalembula.jpg',
+    imageUrl: 'assets/images/pumpkinleaves.jpeg',
   ),
   Product(
     id: -8,
@@ -92,7 +92,7 @@ final List<Product> kStaticProducts = List.unmodifiable([
     createdAt: DateTime.utc(2024, 1, 1),
     description: 'Free-range chicken cooked in a rich tomato and onion sauce.',
     category: 'Extras',
-    imageUrl: 'assets/images/village_chicken_relish.jpg',
+    imageUrl: 'assets/images/villagechicken.jpeg',
   ),
   Product(
     id: -10,
@@ -112,7 +112,7 @@ final List<Product> kStaticProducts = List.unmodifiable([
     createdAt: DateTime.utc(2024, 1, 1),
     description: 'Sweet, refreshing non-alcoholic beverage made from fermented maize meal.',
     category: 'Drinks',
-    imageUrl: 'assets/images/maheu.jpg',
+    imageUrl: 'assets/images/maheu.jpeg',
   ),
   Product(
     id: -12,
@@ -122,6 +122,6 @@ final List<Product> kStaticProducts = List.unmodifiable([
     createdAt: DateTime.utc(2024, 1, 1),
     description: 'Traditional opaque beer made from maize and sorghum.',
     category: 'Drinks',
-    imageUrl: 'assets/images/chibuku.jpg',
+    imageUrl: 'assets/images/chibuku.jpeg',
   ),
 ]);
