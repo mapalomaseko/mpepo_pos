@@ -21,7 +21,6 @@ print("DEBUG: MOCK_TAX_API_URL -->", MOCK_TAX_API_URL)
 print("DEBUG: MERCHANT_NAME -->", MERCHANT_NAME)
 
 
-
 @router.post("/submit/{receipt_id}", response_model=schemas.Invoice, status_code=status.HTTP_201_CREATED)
 def submit_invoice(receipt_id: int, db: Session = Depends(get_db)):
     """
@@ -50,6 +49,7 @@ def submit_invoice(receipt_id: int, db: Session = Depends(get_db)):
         timestamp=datetime.utcnow()   # keep as datetime for now
     )
 
+
     # Dump to JSON with a custom default=str to convert datetime automatically
     payload_str = invoice_payload.model_dump_json() if hasattr(invoice_payload, "model_dump_json") else json.dumps(
         invoice_payload.dict(), default=str
@@ -57,6 +57,8 @@ def submit_invoice(receipt_id: int, db: Session = Depends(get_db)):
 
     # Convert back to dict for requests.post
     payload = json.loads(payload_str)
+
+    print("DEBUG payload being sent:", payload)
 
     try:
         response = requests.post(MOCK_TAX_API_URL, json=payload, timeout=10)

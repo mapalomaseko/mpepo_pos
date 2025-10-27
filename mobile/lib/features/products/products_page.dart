@@ -546,7 +546,7 @@ class _ProductCard extends StatelessWidget {
                       right: 6,
                       child: PopupMenuButton<String>(
                         padding: EdgeInsets.zero,
-                        icon: const Icon(Icons.more_vert, color: Colors.black87, size: 22),
+                          icon: const Icon(Icons.more_vert, color: Colors.white, size: 22),
                         onSelected: (value) {
                           if (value == 'edit' && onEdit != null) {
                             onEdit!();
